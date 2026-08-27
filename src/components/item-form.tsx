@@ -40,6 +40,8 @@ interface FormState {
 type PendingPhoto = { file: File; url: string; tempPath: string | null };
 
 function emptyState(): FormState {
+  const today = new Date();
+  const pad = (n: number) => String(n).padStart(2, "0");
   return {
     inventoryNumber: "",
     name: "",
@@ -50,7 +52,7 @@ function emptyState(): FormState {
     dimensions: "",
     condition: "",
     description: "",
-    acquisitionDate: "",
+    acquisitionDate: `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`,
     locationId: "",
   };
 }
