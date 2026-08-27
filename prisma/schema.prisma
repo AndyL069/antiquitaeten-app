@@ -54,6 +54,7 @@ model Item {
   createdBy       User?       @relation("ItemCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
   photos          Photo[]
   appraisals      Appraisal[]
+  sales           Sale[]
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 
@@ -83,6 +84,20 @@ model Appraisal {
   appraiser     String?
   note          String?
   createdAt     DateTime  @default(now())
+
+  @@index([itemId])
+}
+
+model Sale {
+  id        String    @id @default(uuid())
+  itemId    String
+  item      Item      @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  platform  String
+  amount    Float
+  currency  String    @default("EUR")
+  soldAt    DateTime?
+  note      String?
+  createdAt DateTime  @default(now())
 
   @@index([itemId])
 }

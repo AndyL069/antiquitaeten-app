@@ -6,6 +6,7 @@ import { Header } from "@/components/header";
 import { DeleteItemButton } from "@/components/delete-item-button";
 import { PhotoManager } from "@/components/photo-manager";
 import { AppraisalsSection } from "@/components/appraisals-section";
+import { SalesSection } from "@/components/sales-section";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -23,6 +24,7 @@ export default async function ItemPage({ params }: PageProps<"/items/[id]">) {
       location: true,
       photos: { orderBy: [{ isPrimary: "desc" }, { createdAt: "asc" }] },
       appraisals: { orderBy: { appraisalDate: "desc" } },
+      sales: { orderBy: { soldAt: "desc" } },
     },
   });
   if (!item) notFound();
@@ -59,6 +61,15 @@ export default async function ItemPage({ params }: PageProps<"/items/[id]">) {
     isPrimary: p.isPrimary,
   }));
 
+  const sales = item.sales.map((s) => ({
+    id: s.id,
+    platform: s.platform,
+    amount: s.amount,
+    currency: s.currency,
+    soldAt: s.soldAt ? s.soldAt.toISOString() : null,
+    note: s.note,
+  }));
+
   return (
     <>
       <Header />
@@ -80,6 +91,7 @@ export default async function ItemPage({ params }: PageProps<"/items/[id]">) {
               {item.category ? <Badge variant="secondary">{item.category}</Badge> : null}
               {item.era ? <Badge variant="outline">{item.era}</Badge> : null}
               {item.condition ? <Badge variant="ghost">{item.condition}</Badge> : null}
+              {sales.length > 0 ? <Badge variant="destructive">Verkauft</Badge> : null}
             </div>
           </div>
           <div className="flex items-center gap-1">
@@ -119,6 +131,13 @@ export default async function ItemPage({ params }: PageProps<"/items/[id]">) {
         <section className="flex flex-col gap-4">
           <h2 className="text-xl font-semibold text-primary">Wert & Gutachten</h2>
           <AppraisalsSection itemId={item.id} appraisals={appraisals} />
+        </section>
+
+        <Separator className="my-8" />
+
+        <section className="flex flex-col gap-4">
+          <h2 className="text-xl font-semibold text-primary">Verkauf</h2>
+          <SalesSection itemId={item.id} sales={sales} />
         </section>
 
         {item.location ? (

@@ -330,18 +330,9 @@ export function ItemForm({
           <h3 className="text-lg font-semibold">Ergänzungen von dir</h3>
         </div>
         <p className="-mt-2 text-sm text-muted-foreground">
-          Diese Angaben kann die KI nicht erkennen – bitte selbst ausfüllen.
+          Diese Angaben kann die KI nicht erkennen – bitte selbst ausfüllen. Die Inventarnummer wird automatisch vergeben.
         </p>
         <div className="grid gap-4 sm:grid-cols-2">
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="inventoryNumber">Inventarnummer</Label>
-            <Input
-              id="inventoryNumber"
-              value={form.inventoryNumber}
-              onChange={(e) => set("inventoryNumber", e.target.value)}
-              placeholder="z. B. INV-0001"
-            />
-          </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="locationId">Standort</Label>
             <Select id="locationId" value={form.locationId} onChange={(e) => set("locationId", e.target.value)}>

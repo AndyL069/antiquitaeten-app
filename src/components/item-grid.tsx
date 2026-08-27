@@ -28,6 +28,7 @@ interface ItemSummary {
   createdAt: string;
   location: { id: string; name: string } | null;
   photos: PhotoSummary[];
+  _count: { sales: number };
 }
 
 export function ItemGrid() {
@@ -146,6 +147,7 @@ export function ItemGrid() {
                     <div className="mt-2 flex flex-wrap gap-1.5">
                       {item.category ? <Badge variant="secondary">{item.category}</Badge> : null}
                       {item.era ? <Badge variant="outline">{item.era}</Badge> : null}
+                      {item._count?.sales > 0 ? <Badge variant="destructive">Verkauft</Badge> : null}
                     </div>
                     {item.location ? (
                       <p className="mt-2 text-xs text-muted-foreground">Standort: {item.location.name}</p>
