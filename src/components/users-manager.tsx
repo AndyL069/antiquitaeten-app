@@ -11,6 +11,7 @@ interface UserItem {
   email: string;
   name: string | null;
   role: "ADMIN" | "MEMBER";
+  authProvider: string;
   createdAt: string;
 }
 
@@ -71,6 +72,9 @@ export function UsersManager({ users, currentUserId }: { users: UserItem[]; curr
                   ) : (
                     <Badge variant="secondary">Mitglied</Badge>
                   )}
+                  <div className="mt-1">
+                    <Badge variant="ghost">{u.authProvider === "authentik" ? "Authentik" : "Lokal"}</Badge>
+                  </div>
                 </td>
                 <td className="px-3 py-2 text-muted-foreground">
                   {new Date(u.createdAt).toLocaleDateString("de-DE")}

@@ -12,7 +12,7 @@ export default async function AdminPage() {
 
   const users = await prisma.user.findMany({
     orderBy: { createdAt: "asc" },
-    select: { id: true, email: true, name: true, role: true, createdAt: true },
+    select: { id: true, email: true, name: true, role: true, authProvider: true, createdAt: true },
   });
 
   const list = users.map((u) => ({
@@ -20,6 +20,7 @@ export default async function AdminPage() {
     email: u.email,
     name: u.name,
     role: u.role,
+    authProvider: u.authProvider,
     createdAt: u.createdAt.toISOString(),
   }));
 

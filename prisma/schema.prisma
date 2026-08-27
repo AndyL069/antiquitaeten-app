@@ -19,6 +19,7 @@ model User {
   name         String?
   passwordHash String
   role         Role     @default(MEMBER)
+  authProvider String   @default("credentials")
   createdAt    DateTime @default(now())
   items        Item[]   @relation("ItemCreatedBy")
 }

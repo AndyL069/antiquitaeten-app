@@ -34,6 +34,9 @@ services:
       UPLOAD_DIR: uploads
       GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
       GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+      AUTHENTIK_ISSUER: ${AUTHENTIK_ISSUER:-}
+      AUTHENTIK_CLIENT_ID: ${AUTHENTIK_CLIENT_ID:-}
+      AUTHENTIK_CLIENT_SECRET: ${AUTHENTIK_CLIENT_SECRET:-}
     ports:
       - "3003:3000"
     volumes:
