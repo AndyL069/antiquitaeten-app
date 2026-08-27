@@ -1,0 +1,42 @@
+services:
+  db:
+    image: postgres:16
+    container_name: antiquitaeten-app-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-antik}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD muss gesetzt sein}
+      POSTGRES_DB: ${POSTGRES_DB:-antik_app}
+    ports:
+      - "5433:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U antik -d antik_app"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: antiquitaeten-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-antik}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD muss gesetzt sein}@db:5432/${POSTGRES_DB:-antik_app}?schema=public
+      AUTH_URL: ${AUTH_URL:-http://localhost:3003}
+      AUTH_SECRET: ${AUTH_SECRET:?AUTH_SECRET muss gesetzt sein}
+      AUTH_TRUST_HOST: "true"
+      UPLOAD_DIR: uploads
+    ports:
+      - "3003:3000"
+    volumes:
+      - uploads_data:/app/uploads
+
+volumes:
+  db_data:
+  uploads_data:

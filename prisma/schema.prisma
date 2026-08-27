@@ -1,0 +1,88 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  MEMBER
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  name         String?
+  passwordHash String
+  role         Role     @default(MEMBER)
+  createdAt    DateTime @default(now())
+  items        Item[]   @relation("ItemCreatedBy")
+}
+
+model Location {
+  id          String     @id @default(uuid())
+  name        String
+  description String?
+  parentId    String?
+  parent      Location?  @relation("LocationTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children    Location[] @relation("LocationTree")
+  items       Item[]
+  createdAt   DateTime   @default(now())
+}
+
+model Item {
+  id              String      @id @default(uuid())
+  inventoryNumber String?     @unique
+  name            String
+  category        String?
+  era             String?
+  origin          String?
+  material        String?
+  dimensions      String?
+  condition       String?
+  description     String?
+  acquisitionDate DateTime?
+  acquisitionNote String?
+  searchText      String      @default("")
+  locationId      String?
+  location        Location?   @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  createdById     String?
+  createdBy       User?       @relation("ItemCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  photos          Photo[]
+  appraisals      Appraisal[]
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([locationId])
+  @@index([createdById])
+}
+
+model Photo {
+  id        String   @id @default(uuid())
+  itemId    String
+  item      Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  path      String
+  caption   String?
+  isPrimary Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([itemId])
+}
+
+model Appraisal {
+  id            String    @id @default(uuid())
+  itemId        String
+  item          Item      @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  value         Float
+  currency      String    @default("EUR")
+  appraisalDate DateTime?
+  appraiser     String?
+  note          String?
+  createdAt     DateTime  @default(now())
+
+  @@index([itemId])
+}
