@@ -34,7 +34,6 @@ interface FormState {
   condition: string;
   description: string;
   acquisitionDate: string;
-  acquisitionNote: string;
   locationId: string;
 }
 
@@ -52,7 +51,6 @@ function emptyState(): FormState {
     condition: "",
     description: "",
     acquisitionDate: "",
-    acquisitionNote: "",
     locationId: "",
   };
 }
@@ -349,15 +347,6 @@ export function ItemForm({
           <div className="flex flex-col gap-2">
             <Label htmlFor="acquisitionDate">Übernahmedatum</Label>
             <Input id="acquisitionDate" type="date" value={form.acquisitionDate} onChange={(e) => set("acquisitionDate", e.target.value)} />
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="acquisitionNote">Übernahme / Erblasser</Label>
-            <Input
-              id="acquisitionNote"
-              value={form.acquisitionNote}
-              onChange={(e) => set("acquisitionNote", e.target.value)}
-              placeholder="z. B. geerbt von Großmutter"
-            />
           </div>
         </div>
       </div>

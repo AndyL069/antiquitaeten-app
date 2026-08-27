@@ -42,7 +42,6 @@ export default async function ItemPage({ params }: PageProps<"/items/[id]">) {
     { label: "Zustand", value: item.condition ?? "" },
     { label: "Standort", value: item.location?.name ?? "" },
     { label: "Übernahmedatum", value: formatDate(item.acquisitionDate) },
-    { label: "Übernahme / Erblasser", value: item.acquisitionNote ?? "" },
   ].filter((f) => f.value);
 
   const appraisals = item.appraisals.map((a) => ({

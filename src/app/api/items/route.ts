@@ -97,7 +97,6 @@ export async function POST(req: Request) {
           condition: data.condition || null,
           description: data.description || null,
           acquisitionDate: data.acquisitionDate ? new Date(data.acquisitionDate) : null,
-          acquisitionNote: data.acquisitionNote || null,
           locationId: data.locationId || null,
           createdById: session.user.id,
           searchText: buildSearchText(data),

@@ -20,7 +20,6 @@ export type ItemInput = {
   condition: string;
   description: string;
   acquisitionDate: string;
-  acquisitionNote: string;
   locationId: string;
 };
 
@@ -46,7 +45,6 @@ export function parseItemInput(body: unknown): ItemInput | { error: string } {
     condition: str(b.condition),
     description: str(b.description),
     acquisitionDate: str(b.acquisitionDate),
-    acquisitionNote: str(b.acquisitionNote),
     locationId: str(b.locationId),
   };
 }

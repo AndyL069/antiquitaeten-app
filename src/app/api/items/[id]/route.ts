@@ -53,7 +53,6 @@ export async function PATCH(req: Request, { params }: Params) {
         condition: data.condition || null,
         description: data.description || null,
         acquisitionDate: data.acquisitionDate ? new Date(data.acquisitionDate) : null,
-        acquisitionNote: data.acquisitionNote || null,
         locationId: data.locationId || null,
         searchText: buildSearchText(data),
       },
