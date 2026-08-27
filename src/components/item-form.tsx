@@ -33,6 +33,7 @@ interface FormState {
   dimensions: string;
   condition: string;
   description: string;
+  context: string;
   acquisitionDate: string;
   locationId: string;
 }
@@ -52,6 +53,7 @@ function emptyState(): FormState {
     dimensions: "",
     condition: "",
     description: "",
+    context: "",
     acquisitionDate: `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`,
     locationId: "",
   };
@@ -132,6 +134,7 @@ export function ItemForm({
         dimensions: d.dimensions || f.dimensions,
         condition: d.condition || f.condition,
         description: d.description || f.description,
+        context: d.context || f.context,
       }));
       const tempPaths = (data.tempPaths ?? []) as string[];
       setPhotos((prev) => prev.map((p, i) => ({ ...p, tempPath: tempPaths[i] ?? p.tempPath })));
@@ -316,7 +319,17 @@ export function ItemForm({
               value={form.description}
               onChange={(e) => set("description", e.target.value)}
               rows={4}
-              placeholder="Beschreibung, Besonderheiten, Signaturen …"
+              placeholder="Wie das Objekt aussieht (Optik, Ausführung, Details …)"
+            />
+          </div>
+          <div className="flex flex-col gap-2 sm:col-span-2">
+            <Label htmlFor="context">Hintergrund / Kontext</Label>
+            <Textarea
+              id="context"
+              value={form.context}
+              onChange={(e) => set("context", e.target.value)}
+              rows={3}
+              placeholder="z. B. bei einem Buch: Worum geht es darin, wofür ist es bekannt?"
             />
           </div>
         </div>

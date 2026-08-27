@@ -96,6 +96,7 @@ export async function POST(req: Request) {
           dimensions: data.dimensions || null,
           condition: data.condition || null,
           description: data.description || null,
+          context: data.context || null,
           acquisitionDate: data.acquisitionDate ? new Date(data.acquisitionDate) : null,
           locationId: data.locationId || null,
           createdById: session.user.id,

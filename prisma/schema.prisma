@@ -45,6 +45,7 @@ model Item {
   dimensions      String?
   condition       String?
   description     String?
+  context         String?
   acquisitionDate DateTime?
   acquisitionNote String?
   searchText      String      @default("")

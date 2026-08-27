@@ -24,8 +24,9 @@ const jsonSchema = {
     dimensions: { type: "string" },
     condition: { type: "string" },
     description: { type: "string" },
+    context: { type: "string" },
   },
-  required: ["name", "category", "era", "origin", "material", "dimensions", "condition", "description"],
+  required: ["name", "category", "era", "origin", "material", "dimensions", "condition", "description", "context"],
   additionalProperties: false,
 } as const;
 
@@ -42,45 +43,42 @@ export async function extractItemDetailsFromImage(
     inlineData: { mimeType: img.mimeType, data: img.base64 },
   }));
 
-  const response = await ai.models.generateContent({
-    model,
-    contents: [
-      {
-        role: "user",
-        parts: [
-          ...imageParts,
-          {
-            text:
-              (images.length > 1
-                ? "Du bekommst mehrere Fotos DERSELBEN antiken Sammlungsstücks. Kombiniere die Informationen aus ALLEN Bildern zu einer einzigen Beschreibung. "
-                : "Du bekommst ein Foto eines antiken Sammlungsstücks. ") +
-              "Analysiere das abgebildete Objekt und gib die Werte JSON zurück. Regeln: " +
-              "name: ein kurzer, beschreibender Titel auf Deutsch (z. B. 'Porzellankanne', 'Standuhr'). " +
-              "category: genau eine der folgenden Optionen: " +
-              CATEGORIES.join(", ") +
-              ". " +
-              "era: die wahrscheinliche Epoche/Zeit (z. B. 'Jugendstil', 'Biedermeier') – beste Schätzung, sonst ''. " +
-              "origin: Herkunft/Manufaktur/Signatur, falls sichtbar (z. B. 'Meißen'), sonst ''. " +
-              "material: Materialien (z. B. 'Porzellan, Messing'), sonst ''. " +
-              "dimensions: ungefähre Maße, falls sichtbar oder schätzbar (z. B. 'H 22 cm'), sonst ''. " +
-              "condition: genau eines von: " +
-              CONDITIONS.join(", ") +
-              " – beste Schätzung, sonst ''. " +
-              "description: sachliche Beschreibung auf Deutsch, nur was sichtbar ist. " +
-              "Erfinde KEINE Herkunft, keinen Besitzer und keine Geschichte. Eigennamen nicht übersetzen.",
-          },
-        ],
-      },
-    ],
-    config: {
-      temperature: 0,
-      responseMimeType: "application/json",
-      responseJsonSchema: jsonSchema,
-    },
-  });
+  const prompt =
+    (images.length > 1
+      ? "Du bekommst mehrere Fotos DERSELBEN antiken Sammlungsstücks. Kombiniere die Informationen aus ALLEN Bildern zu einer einzigen Beschreibung. "
+      : "Du bekommst ein Foto eines antiken Sammlungsstücks. ") +
+    "Analysiere das abgebildete Objekt und gib die Werte JSON zurück. Regeln: " +
+    "name: ein kurzer, beschreibender Titel auf Deutsch (z. B. 'Porzellankanne', 'Standuhr'). " +
+    "category: genau eine der folgenden Optionen: " +
+    CATEGORIES.join(", ") +
+    ". " +
+    "era: die wahrscheinliche Epoche/Zeit (z. B. 'Jugendstil', 'Biedermeier') – beste Schätzung, sonst ''. " +
+    "origin: Herkunft/Manufaktur/Signatur, falls sichtbar (z. B. 'Meißen'), sonst ''. " +
+    "material: Materialien (z. B. 'Porzellan, Messing'), sonst ''. " +
+    "dimensions: ungefähre Maße, falls sichtbar oder schätzbar (z. B. 'H 22 cm'), sonst ''. " +
+    "condition: genau eines von: " +
+    CONDITIONS.join(", ") +
+    " – beste Schätzung, sonst ''. " +
+    "description: eine sachliche Beschreibung auf Deutsch, die NUR das Aussehen/die Optik beschreibt (Ausführung, Details, Zustand, Material hier beschreiben) – nur was sichtbar ist. " +
+    "context: Hintergrundwissen zu dem Objekt. Bei einem Buch: worum es im Werk geht und wofür es (bzw. der Autor) bekannt ist. Bei anderen Objekten: falls du sicher weißt, wofür das Stück bzw. der Stil/Hersteller bekannt ist, ein kurzer Satz (z. B. Manufaktur oder Epoche). Erfinde NICHTS – wenn du unsicher bist oder keine verlässlichen Angaben dazu hast, leeres Feld ''. Komplett auf Deutsch. " +
+    "Erfinde KEINE Herkunft, keinen Besitzer und keine Geschichte (die gehören nicht in description oder context, solange sie nicht sicher bekannt sind). Eigennamen nicht übersetzen.";
 
-  if (!response.text) throw new Error("Leere Antwort vom Modell");
-  const parsed = JSON.parse(response.text) as Record<string, unknown>;
+  let parsed: Record<string, unknown> = {};
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const response = await ai.models.generateContent({
+      model,
+      contents: [{ role: "user", parts: [...imageParts, { text: prompt }] }],
+      config: {
+        temperature: 0,
+        responseMimeType: "application/json",
+        responseJsonSchema: jsonSchema,
+      },
+    });
+    if (!response.text) throw new Error("Leere Antwort vom Modell");
+    const result = JSON.parse(response.text) as Record<string, unknown>;
+    parsed = result;
+    if (str(result.name)) break;
+  }
 
   return {
     name: str(parsed.name),
@@ -91,5 +89,6 @@ export async function extractItemDetailsFromImage(
     dimensions: str(parsed.dimensions),
     condition: str(parsed.condition),
     description: str(parsed.description),
+    context: str(parsed.context),
   };
 }

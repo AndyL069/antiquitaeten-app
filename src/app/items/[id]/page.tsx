@@ -118,6 +118,13 @@ export default async function ItemPage({ params }: PageProps<"/items/[id]">) {
           <p className="mt-6 whitespace-pre-line leading-relaxed text-foreground/90">{item.description}</p>
         ) : null}
 
+        {item.context ? (
+          <div className="mt-4">
+            <h3 className="text-sm font-semibold text-muted-foreground">Hintergrund / Kontext</h3>
+            <p className="mt-1 whitespace-pre-line leading-relaxed text-foreground/90">{item.context}</p>
+          </div>
+        ) : null}
+
         <Separator className="my-8" />
 
         <section className="flex flex-col gap-4">

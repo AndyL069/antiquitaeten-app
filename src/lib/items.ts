@@ -7,6 +7,7 @@ export type ItemDetails = {
   dimensions: string;
   condition: string;
   description: string;
+  context: string;
 };
 
 export type ItemInput = {
@@ -19,6 +20,7 @@ export type ItemInput = {
   dimensions: string;
   condition: string;
   description: string;
+  context: string;
   acquisitionDate: string;
   locationId: string;
 };
@@ -44,6 +46,7 @@ export function parseItemInput(body: unknown): ItemInput | { error: string } {
     dimensions: str(b.dimensions),
     condition: str(b.condition),
     description: str(b.description),
+    context: str(b.context),
     acquisitionDate: str(b.acquisitionDate),
     locationId: str(b.locationId),
   };
@@ -58,6 +61,7 @@ export function buildSearchText(data: ItemInput): string {
     data.origin,
     data.material,
     data.description,
+    data.context,
   ]
     .filter(Boolean)
     .join(" \u0001 ");
