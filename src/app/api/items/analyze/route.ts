@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { assertUploadType, saveTempUpload, MAX_PHOTOS } from "@/lib/uploads";
+import { assertUploadType, MAX_PHOTOS } from "@/lib/uploads";
 import { extractItemDetailsFromImage } from "@/lib/gemini";
 import { requireSession } from "@/lib/session";
 
@@ -31,16 +31,15 @@ export async function POST(req: Request) {
     }
   }
 
-  const tempPaths: string[] = [];
   const images: { base64: string; mimeType: string }[] = [];
+  for (const file of files) {
+    const bytes = Buffer.from(await file.arrayBuffer());
+    images.push({ base64: bytes.toString("base64"), mimeType: file.type });
+  }
+
   try {
-    for (const file of files) {
-      const bytes = Buffer.from(await file.arrayBuffer());
-      tempPaths.push(await saveTempUpload(bytes, file.type));
-      images.push({ base64: bytes.toString("base64"), mimeType: file.type });
-    }
     const details = await extractItemDetailsFromImage(images);
-    return NextResponse.json({ details, tempPaths });
+    return NextResponse.json({ details });
   } catch (e) {
     const message =
       e instanceof Error && e.message.includes("API-Key")

@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
-import path from "path";
 import { prisma } from "@/lib/prisma";
 import { buildSearchText, parseItemInput } from "@/lib/items";
-import { finalizeTempPhoto } from "@/lib/uploads";
+import { assertUploadType, saveItemPhoto, MAX_PHOTOS } from "@/lib/uploads";
 import { requireSession } from "@/lib/session";
 
 async function nextInventoryNumber(prefix = "INV-"): Promise<string> {
@@ -65,18 +64,27 @@ export async function POST(req: Request) {
   const session = await requireSession();
   if (!session) return NextResponse.json({ error: "Nicht authentifiziert" }, { status: 401 });
 
-  const body = await req.json().catch(() => null);
-  const data = parseItemInput(body);
+  const form = await req.formData().catch(() => null);
+  if (!form) return NextResponse.json({ error: "Ungültige Anfrage" }, { status: 400 });
+
+  const fields: Record<string, string> = {};
+  for (const [key, value] of form.entries()) {
+    if (typeof value === "string") fields[key] = value;
+  }
+  const data = parseItemInput(fields);
   if ("error" in data) return NextResponse.json({ error: data.error }, { status: 400 });
 
-  const photoPaths = Array.isArray((body as { photoPaths?: unknown })?.photoPaths)
-    ? (body as { photoPaths: unknown[] }).photoPaths
-        .filter((p): p is string => typeof p === "string")
-        .map((p) => path.normalize(p))
-        .filter((p) => p.startsWith("tmp"))
-    : [];
-  if (photoPaths.some((p) => p.startsWith("..") || path.isAbsolute(p))) {
-    return NextResponse.json({ error: "Ungültiger Bildpfad" }, { status: 400 });
+  const files = form.getAll("photo").filter((f): f is File => f instanceof File);
+  if (files.length > MAX_PHOTOS) {
+    return NextResponse.json({ error: `Maximal ${MAX_PHOTOS} Bilder pro Objekt erlaubt` }, { status: 400 });
+  }
+  for (const file of files) {
+    try {
+      assertUploadType(file.type, file.size);
+    } catch (e) {
+      const err = e as Error & { status?: number };
+      return NextResponse.json({ error: err.message }, { status: err.status ?? 400 });
+    }
   }
 
   const autoNumber = !data.inventoryNumber;
@@ -104,15 +112,10 @@ export async function POST(req: Request) {
         },
       });
 
-      const finalPaths: string[] = [];
-      for (const rel of photoPaths) {
-        const finalized = await finalizeTempPhoto(rel, item.id).catch(() => null);
-        if (finalized) finalPaths.push(finalized);
-      }
-      if (finalPaths.length > 0) {
-        await prisma.photo.createMany({
-          data: finalPaths.map((p, i) => ({ itemId: item.id, path: p, isPrimary: i === 0 })),
-        });
+      for (let i = 0; i < files.length; i++) {
+        const bytes = Buffer.from(await files[i].arrayBuffer());
+        const rel = await saveItemPhoto(item.id, bytes, files[i].type);
+        await prisma.photo.create({ data: { itemId: item.id, path: rel, isPrimary: i === 0 } });
       }
 
       return NextResponse.json({ id: item.id, inventoryNumber }, { status: 201 });

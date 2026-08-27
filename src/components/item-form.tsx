@@ -38,7 +38,7 @@ interface FormState {
   locationId: string;
 }
 
-type PendingPhoto = { file: File; url: string; tempPath: string | null };
+type PendingPhoto = { file: File; url: string };
 
 function emptyState(): FormState {
   const today = new Date();
@@ -86,7 +86,7 @@ export function ItemForm({
   function addFiles(fileList: FileList | File[]) {
     const files = Array.from(fileList);
     if (files.length === 0) return;
-    const combined = [...photos, ...files.map((file) => ({ file, url: URL.createObjectURL(file), tempPath: null as string | null }))];
+    const combined = [...photos, ...files.map((file) => ({ file, url: URL.createObjectURL(file) }))];
     if (combined.length > 6) {
       toast.error("Maximal 6 Bilder pro Objekt");
       return;
@@ -136,8 +136,6 @@ export function ItemForm({
         description: d.description || f.description,
         context: d.context || f.context,
       }));
-      const tempPaths = (data.tempPaths ?? []) as string[];
-      setPhotos((prev) => prev.map((p, i) => ({ ...p, tempPath: tempPaths[i] ?? p.tempPath })));
       setAnalyzed(true);
       toast.success("Eigenschaften erkannt");
     } catch {
@@ -154,15 +152,19 @@ export function ItemForm({
     }
     setSaving(true);
     try {
-      const body = {
-        ...form,
-        photoPaths: photos.map((p) => p.tempPath).filter((p): p is string => !!p),
-      };
-      const res = await fetch(mode === "new" ? "/api/items" : `/api/items/${itemId}`, {
-        method: mode === "new" ? "POST" : "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
+      let res: Response;
+      if (mode === "new") {
+        const formData = new FormData();
+        Object.entries(form).forEach(([k, v]) => formData.append(k, v));
+        for (const p of photos) formData.append("photo", p.file);
+        res = await fetch("/api/items", { method: "POST", body: formData });
+      } else {
+        res = await fetch(`/api/items/${itemId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form),
+        });
+      }
       const data = await res.json();
       if (!res.ok) {
         toast.error(data.error ?? "Speichern fehlgeschlagen");

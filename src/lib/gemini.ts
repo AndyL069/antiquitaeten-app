@@ -48,7 +48,7 @@ export async function extractItemDetailsFromImage(
       ? "Du bekommst mehrere Fotos DERSELBEN antiken Sammlungsstücks. Kombiniere die Informationen aus ALLEN Bildern zu einer einzigen Beschreibung. "
       : "Du bekommst ein Foto eines antiken Sammlungsstücks. ") +
     "Analysiere das abgebildete Objekt und gib die Werte JSON zurück. Regeln: " +
-    "name: ein kurzer, beschreibender Titel auf Deutsch (z. B. 'Porzellankanne', 'Standuhr'). " +
+    "name: der Titel/Name, wie er am Objekt steht – IMMER im Original belassen, NICHT übersetzen (z. B. 'Handfeuerwaffen Bewertung von Johan F. Stockel'). Falls kein sichtbarer Titel vorhanden ist, ein kurzer beschreibender Titel auf Deutsch (z. B. 'Porzellankanne', 'Standuhr'). " +
     "category: genau eine der folgenden Optionen: " +
     CATEGORIES.join(", ") +
     ". " +
