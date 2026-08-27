@@ -4,11 +4,9 @@ services:
     container_name: antiquitaeten-app-db
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-antik}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD muss gesetzt sein}
-      POSTGRES_DB: ${POSTGRES_DB:-antik_app}
-    ports:
-      - "5433:5432"
+      POSTGRES_USER: antik
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: antik_app
     volumes:
       - db_data:/var/lib/postgresql/data
     healthcheck:
@@ -18,25 +16,26 @@ services:
       retries: 10
 
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/andyl069/antiquitaeten-app:latest
     container_name: antiquitaeten-app
     restart: unless-stopped
+    extra_hosts:
+      - "antik.am-homelab.de:192.168.178.117"
+      - "auth.am-homelab.de:192.168.178.117"
     depends_on:
       db:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-antik}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD muss gesetzt sein}@db:5432/${POSTGRES_DB:-antik_app}?schema=public
-      AUTH_URL: ${AUTH_URL:-http://localhost:3003}
-      AUTH_SECRET: ${AUTH_SECRET:?AUTH_SECRET muss gesetzt sein}
+      DATABASE_URL: postgresql://antik:${POSTGRES_PASSWORD}@db:5432/antik_app?schema=public
+      AUTH_URL: ${AUTH_URL}
+      AUTH_SECRET: ${AUTH_SECRET}
       AUTH_TRUST_HOST: "true"
-      UPLOAD_DIR: uploads
-      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
       GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
-      AUTHENTIK_ISSUER: ${AUTHENTIK_ISSUER:-}
-      AUTHENTIK_CLIENT_ID: ${AUTHENTIK_CLIENT_ID:-}
-      AUTHENTIK_CLIENT_SECRET: ${AUTHENTIK_CLIENT_SECRET:-}
+      UPLOAD_DIR: uploads
+      AUTHENTIK_ISSUER: ${AUTHENTIK_ISSUER}
+      AUTHENTIK_CLIENT_ID: ${AUTHENTIK_CLIENT_ID}
+      AUTHENTIK_CLIENT_SECRET: ${AUTHENTIK_CLIENT_SECRET}
     ports:
       - "3003:3000"
     volumes:
