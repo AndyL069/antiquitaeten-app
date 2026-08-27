@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
+import path from "path";
 import { prisma } from "@/lib/prisma";
 import { buildSearchText, parseItemInput } from "@/lib/items";
+import { finalizeTempPhoto } from "@/lib/uploads";
 import { requireSession } from "@/lib/session";
 
 export async function GET(req: Request) {
@@ -53,6 +55,16 @@ export async function POST(req: Request) {
   const data = parseItemInput(body);
   if ("error" in data) return NextResponse.json({ error: data.error }, { status: 400 });
 
+  const photoPaths = Array.isArray((body as { photoPaths?: unknown })?.photoPaths)
+    ? (body as { photoPaths: unknown[] }).photoPaths
+        .filter((p): p is string => typeof p === "string")
+        .map((p) => path.normalize(p))
+        .filter((p) => p.startsWith("tmp"))
+    : [];
+  if (photoPaths.some((p) => p.startsWith("..") || path.isAbsolute(p))) {
+    return NextResponse.json({ error: "Ungültiger Bildpfad" }, { status: 400 });
+  }
+
   try {
     const item = await prisma.item.create({
       data: {
@@ -72,6 +84,18 @@ export async function POST(req: Request) {
         searchText: buildSearchText(data),
       },
     });
+
+    const finalPaths: string[] = [];
+    for (const rel of photoPaths) {
+      const finalized = await finalizeTempPhoto(rel, item.id).catch(() => null);
+      if (finalized) finalPaths.push(finalized);
+    }
+    if (finalPaths.length > 0) {
+      await prisma.photo.createMany({
+        data: finalPaths.map((p, i) => ({ itemId: item.id, path: p, isPrimary: i === 0 })),
+      });
+    }
+
     return NextResponse.json({ id: item.id }, { status: 201 });
   } catch (e) {
     if ((e as { code?: string }).code === "P2002") {

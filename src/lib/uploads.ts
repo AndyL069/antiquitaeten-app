@@ -1,10 +1,11 @@
-import { mkdir, writeFile, rm } from "fs/promises";
+import { mkdir, writeFile, rm, rename } from "fs/promises";
 import path from "path";
 import { randomUUID } from "crypto";
 
 const UPLOADS_ROOT = path.join(process.cwd(), "uploads");
 
 export const MAX_UPLOAD_BYTES = 15 * 1024 * 1024;
+export const MAX_PHOTOS = 6;
 const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/webp"];
 
 function extFor(mime: string): string {
@@ -27,6 +28,23 @@ export async function saveItemPhoto(itemId: string, bytes: Buffer, mimeType: str
   await mkdir(dir, { recursive: true });
   const rel = path.join(itemId, `${randomUUID()}.${extFor(mimeType)}`);
   await writeFile(path.join(UPLOADS_ROOT, rel), bytes);
+  return rel;
+}
+
+export async function saveTempUpload(bytes: Buffer, mimeType: string): Promise<string> {
+  const dir = path.join(UPLOADS_ROOT, "tmp");
+  await mkdir(dir, { recursive: true });
+  const rel = path.join("tmp", `${randomUUID()}.${extFor(mimeType)}`);
+  await writeFile(path.join(UPLOADS_ROOT, rel), bytes);
+  return rel;
+}
+
+export async function finalizeTempPhoto(tempRel: string, itemId: string): Promise<string> {
+  const dir = path.join(UPLOADS_ROOT, itemId);
+  await mkdir(dir, { recursive: true });
+  const ext = path.extname(tempRel).slice(1) || "png";
+  const rel = path.join(itemId, `${randomUUID()}.${ext}`);
+  await rename(path.join(UPLOADS_ROOT, tempRel), path.join(UPLOADS_ROOT, rel));
   return rel;
 }
 

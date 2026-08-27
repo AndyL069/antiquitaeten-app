@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { uploadUrl } from "@/lib/upload-url";
-import { ImagePlusIcon, Loader2Icon, StarIcon, Trash2Icon } from "lucide-react";
+import { ImagePlusIcon, Loader2Icon, RefreshCwIcon, StarIcon, Trash2Icon } from "lucide-react";
 
 interface PhotoItem {
   id: string;
@@ -18,7 +18,9 @@ interface PhotoItem {
 export function PhotoManager({ itemId, photos }: { itemId: string; photos: PhotoItem[] }) {
   const router = useRouter();
   const [uploading, setUploading] = useState(false);
+  const [replaceId, setReplaceId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const replaceRef = useRef<HTMLInputElement>(null);
 
   async function onUpload(files: FileList | null) {
     if (!files || files.length === 0) return;
@@ -36,6 +38,26 @@ export function PhotoManager({ itemId, photos }: { itemId: string; photos: Photo
       router.refresh();
     } finally {
       setUploading(false);
+    }
+  }
+
+  async function onReplace(file: File | undefined) {
+    if (!file || !replaceId) return;
+    const form = new FormData();
+    form.append("photo", file);
+    setUploading(true);
+    try {
+      const res = await fetch(`/api/photos/${replaceId}`, { method: "POST", body: form });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error ?? "Ersetzen fehlgeschlagen");
+        return;
+      }
+      toast.success("Foto ersetzt");
+      router.refresh();
+    } finally {
+      setUploading(false);
+      setReplaceId(null);
     }
   }
 
@@ -63,6 +85,11 @@ export function PhotoManager({ itemId, photos }: { itemId: string; photos: Photo
     router.refresh();
   }
 
+  function startReplace(id: string) {
+    setReplaceId(id);
+    replaceRef.current?.click();
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
@@ -86,6 +113,9 @@ export function PhotoManager({ itemId, photos }: { itemId: string; photos: Photo
                   <StarIcon className="size-4" />
                 </Button>
               ) : null}
+              <Button variant="secondary" size="icon-sm" aria-label="Foto ersetzen" onClick={() => startReplace(p.id)}>
+                <RefreshCwIcon className="size-4" />
+              </Button>
               <Button variant="destructive" size="icon-sm" aria-label="Foto löschen" onClick={() => remove(p.id)}>
                 <Trash2Icon className="size-4" />
               </Button>
@@ -109,6 +139,16 @@ export function PhotoManager({ itemId, photos }: { itemId: string; photos: Photo
           className="hidden"
           onChange={(e) => {
             void onUpload(e.target.files);
+            e.target.value = "";
+          }}
+        />
+        <input
+          ref={replaceRef}
+          type="file"
+          accept="image/png,image/jpeg,image/webp"
+          className="hidden"
+          onChange={(e) => {
+            void onReplace(e.target.files?.[0]);
             e.target.value = "";
           }}
         />

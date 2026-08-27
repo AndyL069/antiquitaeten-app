@@ -1,3 +1,14 @@
+export type ItemDetails = {
+  name: string;
+  category: string;
+  era: string;
+  origin: string;
+  material: string;
+  dimensions: string;
+  condition: string;
+  description: string;
+};
+
 export type ItemInput = {
   inventoryNumber: string;
   name: string;

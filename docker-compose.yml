@@ -32,6 +32,8 @@ services:
       AUTH_SECRET: ${AUTH_SECRET:?AUTH_SECRET muss gesetzt sein}
       AUTH_TRUST_HOST: "true"
       UPLOAD_DIR: uploads
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
     ports:
       - "3003:3000"
     volumes:
