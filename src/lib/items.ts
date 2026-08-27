@@ -8,6 +8,8 @@ export type ItemDetails = {
   condition: string;
   description: string;
   context: string;
+  estimatedValue: number;
+  valueNote: string;
 };
 
 export type ItemInput = {
@@ -21,6 +23,8 @@ export type ItemInput = {
   condition: string;
   description: string;
   context: string;
+  estimatedValue: string;
+  valueNote: string;
   acquisitionDate: string;
   locationId: string;
 };
@@ -47,6 +51,8 @@ export function parseItemInput(body: unknown): ItemInput | { error: string } {
     condition: str(b.condition),
     description: str(b.description),
     context: str(b.context),
+    estimatedValue: str(b.estimatedValue),
+    valueNote: str(b.valueNote),
     acquisitionDate: str(b.acquisitionDate),
     locationId: str(b.locationId),
   };

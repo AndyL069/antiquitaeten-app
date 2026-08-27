@@ -34,6 +34,8 @@ interface FormState {
   condition: string;
   description: string;
   context: string;
+  estimatedValue: string;
+  valueNote: string;
   acquisitionDate: string;
   locationId: string;
 }
@@ -54,6 +56,8 @@ function emptyState(): FormState {
     condition: "",
     description: "",
     context: "",
+    estimatedValue: "",
+    valueNote: "",
     acquisitionDate: `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`,
     locationId: "",
   };
@@ -123,7 +127,7 @@ export function ItemForm({
         toast.error(data.error ?? "Analyse fehlgeschlagen");
         return;
       }
-      const d = data.details as FormState;
+      const d = data.details as FormState & { estimatedValue?: number };
       setForm((f) => ({
         ...f,
         name: d.name || f.name,
@@ -135,6 +139,8 @@ export function ItemForm({
         condition: d.condition || f.condition,
         description: d.description || f.description,
         context: d.context || f.context,
+        estimatedValue: typeof d.estimatedValue === "number" && d.estimatedValue > 0 ? String(d.estimatedValue) : f.estimatedValue,
+        valueNote: d.valueNote || f.valueNote,
       }));
       setAnalyzed(true);
       toast.success("Eigenschaften erkannt");
@@ -333,6 +339,20 @@ export function ItemForm({
               rows={3}
               placeholder="z. B. bei einem Buch: Worum geht es darin, wofür ist es bekannt?"
             />
+          </div>
+          <div className="flex flex-col gap-2 sm:col-span-2">
+            <Label htmlFor="estimatedValue">Geschätzter Wert (EUR)</Label>
+            <Input
+              id="estimatedValue"
+              type="number"
+              min={0}
+              step="any"
+              inputMode="decimal"
+              value={form.estimatedValue}
+              onChange={(e) => set("estimatedValue", e.target.value)}
+              placeholder="z. B. 350"
+            />
+            {form.valueNote ? <p className="text-xs text-muted-foreground">{form.valueNote}</p> : null}
           </div>
         </div>
       </div>

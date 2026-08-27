@@ -27,6 +27,8 @@ export default async function EditItemPage({ params }: PageProps<"/items/[id]/ed
     condition: item.condition ?? "",
     description: item.description ?? "",
     context: item.context ?? "",
+    estimatedValue: "",
+    valueNote: "",
     acquisitionDate: item.acquisitionDate ? item.acquisitionDate.toISOString().slice(0, 10) : "",
     locationId: item.locationId ?? "",
   };

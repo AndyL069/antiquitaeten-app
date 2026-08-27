@@ -118,6 +118,20 @@ export async function POST(req: Request) {
         await prisma.photo.create({ data: { itemId: item.id, path: rel, isPrimary: i === 0 } });
       }
 
+      const estimatedValue = parseFloat(data.estimatedValue);
+      if (Number.isFinite(estimatedValue) && estimatedValue > 0) {
+        await prisma.appraisal.create({
+          data: {
+            itemId: item.id,
+            value: estimatedValue,
+            currency: "EUR",
+            appraisalDate: new Date(),
+            appraiser: "KI-Schätzung (Gemini)",
+            note: data.valueNote || null,
+          },
+        });
+      }
+
       return NextResponse.json({ id: item.id, inventoryNumber }, { status: 201 });
     } catch (e) {
       if ((e as { code?: string }).code === "P2002" && autoNumber) {

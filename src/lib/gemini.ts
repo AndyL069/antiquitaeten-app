@@ -25,8 +25,10 @@ const jsonSchema = {
     condition: { type: "string" },
     description: { type: "string" },
     context: { type: "string" },
+    estimatedValue: { type: "number" },
+    valueNote: { type: "string" },
   },
-  required: ["name", "category", "era", "origin", "material", "dimensions", "condition", "description", "context"],
+  required: ["name", "category", "era", "origin", "material", "dimensions", "condition", "description", "context", "estimatedValue", "valueNote"],
   additionalProperties: false,
 } as const;
 
@@ -61,6 +63,8 @@ export async function extractItemDetailsFromImage(
     " – beste Schätzung, sonst ''. " +
     "description: eine sachliche Beschreibung auf Deutsch, die NUR das Aussehen/die Optik beschreibt (Ausführung, Details, Zustand, Material hier beschreiben) – nur was sichtbar ist. " +
     "context: Hintergrundwissen zu dem Objekt. Bei einem Buch: worum es im Werk geht und wofür es (bzw. der Autor) bekannt ist. Bei anderen Objekten: falls du sicher weißt, wofür das Stück bzw. der Stil/Hersteller bekannt ist, ein kurzer Satz (z. B. Manufaktur oder Epoche). Erfinde NICHTS – wenn du unsicher bist oder keine verlässlichen Angaben dazu hast, leeres Feld ''. Komplett auf Deutsch. " +
+    "estimatedValue: schätze den Marktwert des Stücks in EUR anhand erkennbarer Merkmale (Material, Qualität, Epoche, Zustand, ggf. Hersteller/Signatur). Sei konservativ und realistisch – eher leicht unter- als überschätzen. Ohne belastbare Grundlage gib 0. " +
+    "valueNote: ein kurzer Begründungssatz auf Deutsch zur Schätzung (z. B. 'Porzellan, gute Erhaltung, Jugendstil'), sonst ''. " +
     "Erfinde KEINE Herkunft, keinen Besitzer und keine Geschichte (die gehören nicht in description oder context, solange sie nicht sicher bekannt sind). Eigennamen nicht übersetzen.";
 
   let parsed: Record<string, unknown> = {};
@@ -90,5 +94,7 @@ export async function extractItemDetailsFromImage(
     condition: str(parsed.condition),
     description: str(parsed.description),
     context: str(parsed.context),
+    estimatedValue: typeof parsed.estimatedValue === "number" && Number.isFinite(parsed.estimatedValue) ? parsed.estimatedValue : 0,
+    valueNote: str(parsed.valueNote),
   };
 }
