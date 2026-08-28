@@ -13,6 +13,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { CATEGORIES, CONDITIONS, ERAS, EBAY_CONDITIONS } from "@/lib/constants";
 import type { LocationOption } from "@/lib/locations";
+import type { ItemDetails } from "@/lib/items";
 import {
   ImagePlusIcon,
   InfoIcon,
@@ -152,7 +153,7 @@ export function ItemForm({
         toast.error(data.error ?? "Analyse fehlgeschlagen");
         return;
       }
-      const d = data.details as FormState & { estimatedValue?: number };
+      const d = data.details as ItemDetails;
       setForm((f) => ({
         ...f,
         name: d.name || f.name,
@@ -164,7 +165,19 @@ export function ItemForm({
         condition: d.condition || f.condition,
         description: d.description || f.description,
         context: d.context || f.context,
-        estimatedValue: typeof d.estimatedValue === "number" && d.estimatedValue > 0 ? String(d.estimatedValue) : f.estimatedValue,
+        author: d.author || f.author,
+        publisher: d.publisher || f.publisher,
+        publicationYear: d.publicationYear || f.publicationYear,
+        edition: d.edition || f.edition,
+        language: d.language || f.language,
+        weight: d.weight || f.weight,
+        ebayTitle: d.ebayTitle || f.ebayTitle,
+        ebayCategory: d.ebayCategory || f.ebayCategory,
+        ebayCondition: d.ebayCondition || f.ebayCondition,
+        ebayConditionNote: d.ebayConditionNote || f.ebayConditionNote,
+        startPrice: d.startPrice && d.startPrice > 0 ? String(d.startPrice) : f.startPrice,
+        buyItNowPrice: d.buyItNowPrice && d.buyItNowPrice > 0 ? String(d.buyItNowPrice) : f.buyItNowPrice,
+        estimatedValue: d.estimatedValue && d.estimatedValue > 0 ? String(d.estimatedValue) : f.estimatedValue,
         valueNote: d.valueNote || f.valueNote,
       }));
       setAnalyzed(true);

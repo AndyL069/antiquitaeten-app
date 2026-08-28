@@ -8,6 +8,18 @@ export type ItemDetails = {
   condition: string;
   description: string;
   context: string;
+  author: string;
+  publisher: string;
+  publicationYear: string;
+  edition: string;
+  language: string;
+  weight: string;
+  ebayTitle: string;
+  ebayCategory: string;
+  ebayCondition: string;
+  ebayConditionNote: string;
+  startPrice: number;
+  buyItNowPrice: number;
   estimatedValue: number;
   valueNote: string;
 };

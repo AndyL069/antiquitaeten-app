@@ -1,6 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import { ItemDetails } from "./items";
-import { CATEGORIES, CONDITIONS } from "./constants";
+import { CATEGORIES, CONDITIONS, EBAY_CONDITIONS } from "./constants";
 
 let client: GoogleGenAI | null = null;
 
@@ -25,10 +25,22 @@ const jsonSchema = {
     condition: { type: "string" },
     description: { type: "string" },
     context: { type: "string" },
+    author: { type: "string" },
+    publisher: { type: "string" },
+    publicationYear: { type: "string" },
+    edition: { type: "string" },
+    language: { type: "string" },
+    weight: { type: "string" },
+    ebayTitle: { type: "string" },
+    ebayCategory: { type: "string" },
+    ebayCondition: { type: "string" },
+    ebayConditionNote: { type: "string" },
+    startPrice: { type: "number" },
+    buyItNowPrice: { type: "number" },
     estimatedValue: { type: "number" },
     valueNote: { type: "string" },
   },
-  required: ["name", "category", "era", "origin", "material", "dimensions", "condition", "description", "context", "estimatedValue", "valueNote"],
+  required: ["name", "category", "era", "origin", "material", "dimensions", "condition", "description", "context", "author", "publisher", "publicationYear", "edition", "language", "weight", "ebayTitle", "ebayCategory", "ebayCondition", "ebayConditionNote", "startPrice", "buyItNowPrice", "estimatedValue", "valueNote"],
   additionalProperties: false,
 } as const;
 
@@ -65,6 +77,20 @@ export async function extractItemDetailsFromImage(
     "context: Hintergrundwissen zu dem Objekt. Bei einem Buch: worum es im Werk geht und wofür es (bzw. der Autor) bekannt ist. Bei anderen Objekten: falls du sicher weißt, wofür das Stück bzw. der Stil/Hersteller bekannt ist, ein kurzer Satz (z. B. Manufaktur oder Epoche). Erfinde NICHTS – wenn du unsicher bist oder keine verlässlichen Angaben dazu hast, leeres Feld ''. Komplett auf Deutsch. " +
     "estimatedValue: schätze den Marktwert des Stücks in EUR anhand erkennbarer Merkmale (Material, Qualität, Epoche, Zustand, ggf. Hersteller/Signatur). Sei konservativ und realistisch – eher leicht unter- als überschätzen. Ohne belastbare Grundlage gib 0. " +
     "valueNote: ein kurzer Begründungssatz auf Deutsch zur Schätzung (z. B. 'Porzellan, gute Erhaltung, Jugendstil'), sonst ''. " +
+    "author: der Autor / die Autorin, falls auf dem Buch sichtbar (Titelseite), sonst ''. " +
+    "publisher: der Verlag bzw. Hersteller, falls sichtbar, sonst ''. " +
+    "publicationYear: das Erscheinungsjahr, falls sichtbar, sonst ''. " +
+    "edition: die Auflage, falls sichtbar (z. B. '1. Auflage'), sonst ''. " +
+    "language: die Sprache des Textes (z. B. 'Dänisch'), sonst ''. " +
+    "weight: IMMER leeres Feld '' – Gewicht ist aus einem Foto nicht bestimmbar. " +
+    "ebayTitle: ein ausführlicher, suchoptimierter eBay-Verkaufstitel (max. ca. 80 Zeichen) auf Grundlage des Objekts, z. B. 'Antikes Buch Handfeuerwaffen – Johan F. Stöckel, 1938'. " +
+    "ebayCategory: die wahrscheinlichste eBay-Kategorie (z. B. 'Bücher > Antiquarische Bücher'), beste Schätzung, sonst ''. " +
+    "ebayCondition: genau eines von: " +
+    EBAY_CONDITIONS.join(", ") +
+    " – anhand des sichtbaren Zustands, sonst ''. " +
+    "ebayConditionNote: kurze Beschreibung des sichtbaren Zustands (Abnutzung, Einband, Seiten), sonst ''. " +
+    "startPrice: ein konservativer Startpreis in EUR für eine Auktion (deutlich unter dem Marktwert, um Bieter zu locken), 0 wenn keine Grundlage. " +
+    "buyItNowPrice: ein realistischer 'Sofort-Kaufen'-Preis in EUR (in Nähe des Marktwerts), 0 wenn keine Grundlage. " +
     "Erfinde KEINE Herkunft, keinen Besitzer und keine Geschichte (die gehören nicht in description oder context, solange sie nicht sicher bekannt sind). Eigennamen nicht übersetzen.";
 
   let parsed: Record<string, unknown> = {};
@@ -94,6 +120,18 @@ export async function extractItemDetailsFromImage(
     condition: str(parsed.condition),
     description: str(parsed.description),
     context: str(parsed.context),
+    author: str(parsed.author),
+    publisher: str(parsed.publisher),
+    publicationYear: str(parsed.publicationYear),
+    edition: str(parsed.edition),
+    language: str(parsed.language),
+    weight: str(parsed.weight),
+    ebayTitle: str(parsed.ebayTitle),
+    ebayCategory: str(parsed.ebayCategory),
+    ebayCondition: str(parsed.ebayCondition),
+    ebayConditionNote: str(parsed.ebayConditionNote),
+    startPrice: typeof parsed.startPrice === "number" && Number.isFinite(parsed.startPrice) ? parsed.startPrice : 0,
+    buyItNowPrice: typeof parsed.buyItNowPrice === "number" && Number.isFinite(parsed.buyItNowPrice) ? parsed.buyItNowPrice : 0,
     estimatedValue: typeof parsed.estimatedValue === "number" && Number.isFinite(parsed.estimatedValue) ? parsed.estimatedValue : 0,
     valueNote: str(parsed.valueNote),
   };
