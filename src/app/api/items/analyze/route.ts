@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import sharp from "sharp";
 import { assertUploadType, MAX_PHOTOS } from "@/lib/uploads";
 import { extractItemDetailsFromImage } from "@/lib/gemini";
 import { requireSession } from "@/lib/session";
@@ -34,7 +35,16 @@ export async function POST(req: Request) {
   const images: { base64: string; mimeType: string }[] = [];
   for (const file of files) {
     const bytes = Buffer.from(await file.arrayBuffer());
-    images.push({ base64: bytes.toString("base64"), mimeType: file.type });
+    try {
+      const resized = await sharp(bytes)
+        .rotate()
+        .resize({ width: 1600, height: 1600, fit: "inside", withoutEnlargement: true })
+        .jpeg({ quality: 85 })
+        .toBuffer();
+      images.push({ base64: resized.toString("base64"), mimeType: "image/jpeg" });
+    } catch {
+      images.push({ base64: bytes.toString("base64"), mimeType: file.type });
+    }
   }
 
   try {
