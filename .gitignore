@@ -48,3 +48,5 @@ next-env.d.ts
 # dev logs
 dev.log
 dev.err.log
+prod.log
+prod.err.log
