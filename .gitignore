@@ -42,7 +42,7 @@ yarn-error.log*
 next-env.d.ts
 
 # uploads
-uploads/
+/uploads/
 .env
 
 # dev logs
