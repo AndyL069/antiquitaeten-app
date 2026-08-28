@@ -66,7 +66,7 @@ export async function extractItemDetailsFromImage(
     "category: genau eine der folgenden Optionen: " +
     CATEGORIES.join(", ") +
     ". " +
-    "era: die wahrscheinliche Epoche/Zeit (z. B. 'Jugendstil', 'Biedermeier') – beste Schätzung, sonst ''. " +
+    "era: die Epoche/Zeit IMMER AUF DEUTSCH (z. B. 'Mitte des 20. Jahrhunderts', 'Jugendstil', 'Biedermeier'), nie in englischer Sprache – beste Schätzung aus dem Bild, sonst ''. " +
     "origin: Herkunft/Manufaktur/Signatur, falls sichtbar (z. B. 'Meißen'), sonst ''. " +
     "material: Materialien (z. B. 'Porzellan, Messing'), sonst ''. " +
     "dimensions: ungefähre Maße, falls sichtbar oder schätzbar (z. B. 'H 22 cm'), sonst ''. " +
@@ -91,6 +91,7 @@ export async function extractItemDetailsFromImage(
     "ebayConditionNote: kurze Beschreibung des sichtbaren Zustands (Abnutzung, Einband, Seiten), sonst ''. " +
     "startPrice: ein konservativer Startpreis in EUR für eine Auktion (deutlich unter dem Marktwert, um Bieter zu locken), 0 wenn keine Grundlage. " +
     "buyItNowPrice: ein realistischer 'Sofort-Kaufen'-Preis in EUR (in Nähe des Marktwerts), 0 wenn keine Grundlage. " +
+    "Alle beschreibenden Werte (era, origin, material, dimensions, description, context, ebayTitle, ebayCategory, ebayCondition, ebayConditionNote, language) IMMER AUF DEUTSCH ausgeben, auch wenn das Objekt englischsprachig ist. Nur Eigennamen (author, publisher), Zahlen (Jahre, Preise) und der 'name' bleiben im Original. " +
     "Erfinde KEINE Herkunft, keinen Besitzer und keine Geschichte (die gehören nicht in description oder context, solange sie nicht sicher bekannt sind). Eigennamen nicht übersetzen.";
 
   let parsed: Record<string, unknown> = {};
