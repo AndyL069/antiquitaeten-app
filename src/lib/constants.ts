@@ -40,3 +40,13 @@ export const CONDITIONS = [
 ] as const;
 
 export const CURRENCIES = ["EUR", "USD", "CHF", "GBP"] as const;
+
+export const EBAY_CONDITIONS = [
+  "Neu",
+  "Neu: Sonstige",
+  "Gebraucht",
+  "Sehr gut",
+  "Gut",
+  "Akzeptabel",
+  "Als Ersatzteil / defekt",
+] as const;

@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { uploadUrl } from "@/lib/upload-url";
-import { formatDate } from "@/lib/items";
+import { formatDate, formatCurrency } from "@/lib/items";
 import { ImageOffIcon, LandmarkIcon, PencilIcon } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -40,8 +40,23 @@ export default async function ItemPage({ params }: PageProps<"/items/[id]">) {
     { label: "Material", value: item.material ?? "" },
     { label: "Maße", value: item.dimensions ?? "" },
     { label: "Zustand", value: item.condition ?? "" },
+    { label: "Autor", value: item.author ?? "" },
+    { label: "Verlag / Hersteller", value: item.publisher ?? "" },
+    { label: "Erscheinungsjahr", value: item.publicationYear ?? "" },
+    { label: "Auflage", value: item.edition ?? "" },
+    { label: "Sprache", value: item.language ?? "" },
     { label: "Standort", value: item.location?.name ?? "" },
     { label: "Übernahmedatum", value: formatDate(item.acquisitionDate) },
+  ].filter((f) => f.value);
+
+  const ebayFields: { label: string; value: string }[] = [
+    { label: "eBay-Titel", value: item.ebayTitle ?? "" },
+    { label: "eBay-Kategorie", value: item.ebayCategory ?? "" },
+    { label: "eBay-Zustand", value: item.ebayCondition ?? "" },
+    { label: "Zustandsbeschreibung", value: item.ebayConditionNote ?? "" },
+    { label: "Gewicht", value: item.weight ?? "" },
+    { label: "Startpreis", value: item.startPrice != null ? formatCurrency(item.startPrice, "EUR") : "" },
+    { label: "Sofort-Kaufen", value: item.buyItNowPrice != null ? formatCurrency(item.buyItNowPrice, "EUR") : "" },
   ].filter((f) => f.value);
 
   const appraisals = item.appraisals.map((a) => ({
@@ -122,6 +137,20 @@ export default async function ItemPage({ params }: PageProps<"/items/[id]">) {
           <div className="mt-4">
             <h3 className="text-sm font-semibold text-muted-foreground">Hintergrund / Kontext</h3>
             <p className="mt-1 whitespace-pre-line leading-relaxed text-foreground/90">{item.context}</p>
+          </div>
+        ) : null}
+
+        {ebayFields.length > 0 ? (
+          <div className="mt-6 rounded-xl border border-border/70 bg-muted/40 p-4">
+            <h3 className="text-sm font-semibold text-muted-foreground">Verkauf (eBay)</h3>
+            <dl className="mt-3 grid grid-cols-1 gap-x-8 gap-y-2 sm:grid-cols-2">
+              {ebayFields.map((f) => (
+                <div key={f.label} className="flex gap-2 text-sm">
+                  <dt className="w-40 shrink-0 text-muted-foreground">{f.label}</dt>
+                  <dd className="min-w-0">{f.value}</dd>
+                </div>
+              ))}
+            </dl>
           </div>
         ) : null}
 

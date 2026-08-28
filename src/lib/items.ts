@@ -23,6 +23,18 @@ export type ItemInput = {
   condition: string;
   description: string;
   context: string;
+  author: string;
+  publisher: string;
+  publicationYear: string;
+  edition: string;
+  language: string;
+  weight: string;
+  ebayTitle: string;
+  ebayCategory: string;
+  ebayCondition: string;
+  ebayConditionNote: string;
+  startPrice: string;
+  buyItNowPrice: string;
   estimatedValue: string;
   valueNote: string;
   acquisitionDate: string;
@@ -51,6 +63,18 @@ export function parseItemInput(body: unknown): ItemInput | { error: string } {
     condition: str(b.condition),
     description: str(b.description),
     context: str(b.context),
+    author: str(b.author),
+    publisher: str(b.publisher),
+    publicationYear: str(b.publicationYear),
+    edition: str(b.edition),
+    language: str(b.language),
+    weight: str(b.weight),
+    ebayTitle: str(b.ebayTitle),
+    ebayCategory: str(b.ebayCategory),
+    ebayCondition: str(b.ebayCondition),
+    ebayConditionNote: str(b.ebayConditionNote),
+    startPrice: str(b.startPrice),
+    buyItNowPrice: str(b.buyItNowPrice),
     estimatedValue: str(b.estimatedValue),
     valueNote: str(b.valueNote),
     acquisitionDate: str(b.acquisitionDate),
@@ -68,6 +92,10 @@ export function buildSearchText(data: ItemInput): string {
     data.material,
     data.description,
     data.context,
+    data.author,
+    data.publisher,
+    data.publicationYear,
+    data.ebayTitle,
   ]
     .filter(Boolean)
     .join(" \u0001 ");

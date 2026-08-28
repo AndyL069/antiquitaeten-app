@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { CATEGORIES, CONDITIONS, ERAS } from "@/lib/constants";
+import { CATEGORIES, CONDITIONS, ERAS, EBAY_CONDITIONS } from "@/lib/constants";
 import type { LocationOption } from "@/lib/locations";
 import {
   ImagePlusIcon,
@@ -20,6 +20,7 @@ import {
   PlusIcon,
   SaveIcon,
   SparklesIcon,
+  TagIcon,
   Trash2Icon,
 } from "lucide-react";
 
@@ -34,6 +35,18 @@ interface FormState {
   condition: string;
   description: string;
   context: string;
+  author: string;
+  publisher: string;
+  publicationYear: string;
+  edition: string;
+  language: string;
+  weight: string;
+  ebayTitle: string;
+  ebayCategory: string;
+  ebayCondition: string;
+  ebayConditionNote: string;
+  startPrice: string;
+  buyItNowPrice: string;
   estimatedValue: string;
   valueNote: string;
   acquisitionDate: string;
@@ -56,6 +69,18 @@ function emptyState(): FormState {
     condition: "",
     description: "",
     context: "",
+    author: "",
+    publisher: "",
+    publicationYear: "",
+    edition: "",
+    language: "",
+    weight: "",
+    ebayTitle: "",
+    ebayCategory: "",
+    ebayCondition: "",
+    ebayConditionNote: "",
+    startPrice: "",
+    buyItNowPrice: "",
     estimatedValue: "",
     valueNote: "",
     acquisitionDate: `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`,
@@ -320,6 +345,26 @@ export function ItemForm({
               ))}
             </Select>
           </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="author">Autor</Label>
+            <Input id="author" value={form.author} onChange={(e) => set("author", e.target.value)} placeholder="z. B. Johan F. Stöckel" />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="publisher">Verlag / Hersteller</Label>
+            <Input id="publisher" value={form.publisher} onChange={(e) => set("publisher", e.target.value)} placeholder="z. B. Verlag, Manufaktur" />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="publicationYear">Erscheinungsjahr</Label>
+            <Input id="publicationYear" value={form.publicationYear} onChange={(e) => set("publicationYear", e.target.value)} placeholder="z. B. 1938" />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="edition">Auflage</Label>
+            <Input id="edition" value={form.edition} onChange={(e) => set("edition", e.target.value)} placeholder="z. B. 1. Auflage" />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="language">Sprache</Label>
+            <Input id="language" value={form.language} onChange={(e) => set("language", e.target.value)} placeholder="z. B. Dänisch" />
+          </div>
           <div className="flex flex-col gap-2 sm:col-span-2">
             <Label htmlFor="description">Beschreibung</Label>
             <Textarea
@@ -384,6 +429,56 @@ export function ItemForm({
           <div className="flex flex-col gap-2">
             <Label htmlFor="acquisitionDate">Übernahmedatum</Label>
             <Input id="acquisitionDate" type="date" value={form.acquisitionDate} onChange={(e) => set("acquisitionDate", e.target.value)} />
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-4 rounded-xl border border-border/70 bg-muted/40 p-4">
+        <div className="flex items-center gap-2">
+          <TagIcon className="size-4 text-muted-foreground" />
+          <h3 className="text-lg font-semibold">Verkauf (eBay)</h3>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="flex flex-col gap-2 sm:col-span-2">
+            <Label htmlFor="ebayTitle">eBay-Titel</Label>
+            <Input id="ebayTitle" value={form.ebayTitle} onChange={(e) => set("ebayTitle", e.target.value)} placeholder="z. B. Antikes Buch Handfeuerwaffen – Johan F. Stöckel, 1938" />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="ebayCategory">eBay-Kategorie</Label>
+            <Input id="ebayCategory" value={form.ebayCategory} onChange={(e) => set("ebayCategory", e.target.value)} placeholder="z. B. Bücher > Antiquarisch" />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="ebayCondition">eBay-Zustand</Label>
+            <Select id="ebayCondition" value={form.ebayCondition} onChange={(e) => set("ebayCondition", e.target.value)}>
+              <option value="">–</option>
+              {EBAY_CONDITIONS.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </Select>
+          </div>
+          <div className="flex flex-col gap-2 sm:col-span-2">
+            <Label htmlFor="ebayConditionNote">Zustandsbeschreibung</Label>
+            <Textarea
+              id="ebayConditionNote"
+              value={form.ebayConditionNote}
+              onChange={(e) => set("ebayConditionNote", e.target.value)}
+              rows={2}
+              placeholder="z. B. Einband berieben, Seiten altersbedingt gebräunt"
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="weight">Gewicht</Label>
+            <Input id="weight" value={form.weight} onChange={(e) => set("weight", e.target.value)} placeholder="z. B. 1,2 kg" />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="startPrice">Startpreis (EUR)</Label>
+            <Input id="startPrice" type="number" min={0} step="any" inputMode="decimal" value={form.startPrice} onChange={(e) => set("startPrice", e.target.value)} placeholder="z. B. 50" />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="buyItNowPrice">Sofort-Kaufen (EUR)</Label>
+            <Input id="buyItNowPrice" type="number" min={0} step="any" inputMode="decimal" value={form.buyItNowPrice} onChange={(e) => set("buyItNowPrice", e.target.value)} placeholder="z. B. 120" />
           </div>
         </div>
       </div>

@@ -47,6 +47,18 @@ model Item {
   condition       String?
   description     String?
   context         String?
+  author          String?
+  publisher       String?
+  publicationYear String?
+  edition         String?
+  language        String?
+  weight          String?
+  ebayTitle       String?
+  ebayCategory    String?
+  ebayCondition   String?
+  ebayConditionNote String?
+  startPrice      Float?
+  buyItNowPrice   Float?
   acquisitionDate DateTime?
   acquisitionNote String?
   searchText      String      @default("")
