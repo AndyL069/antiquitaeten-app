@@ -57,7 +57,15 @@ export async function GET(req: Request) {
     },
   });
 
-  return NextResponse.json({ items });
+  const categoryRows = await prisma.item.findMany({
+    where: { category: { not: null } },
+    distinct: ["category"],
+    select: { category: true },
+    orderBy: { category: "asc" },
+  });
+  const categories = categoryRows.map((c) => c.category as string);
+
+  return NextResponse.json({ items, categories });
 }
 
 export async function POST(req: Request) {

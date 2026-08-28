@@ -10,7 +10,6 @@ import { Select } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { uploadUrl } from "@/lib/upload-url";
-import { CATEGORIES } from "@/lib/constants";
 
 interface PhotoSummary {
   id: string;
@@ -35,6 +34,7 @@ export function ItemGrid() {
   const [q, setQ] = useState("");
   const [category, setCategory] = useState("");
   const [items, setItems] = useState<ItemSummary[] | null>(null);
+  const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -48,6 +48,7 @@ export function ItemGrid() {
         if (res.ok) {
           const data = await res.json();
           setItems(data.items as ItemSummary[]);
+          setCategories(data.categories as string[]);
         }
       } finally {
         setLoading(false);
@@ -75,7 +76,7 @@ export function ItemGrid() {
           aria-label="Kategorie filtern"
         >
           <option value="">Alle Kategorien</option>
-          {CATEGORIES.map((c) => (
+          {categories.map((c) => (
             <option key={c} value={c}>
               {c}
             </option>
