@@ -1,42 +1,34 @@
-# syntax=docker/dockerfile:1
-FROM node:20-bookworm-slim AS deps
-WORKDIR /app
-COPY package.json package-lock.json ./
-COPY prisma ./prisma
-RUN npm ci
+# ==========================================
+# Stage 1: Build React Frontend
+# ==========================================
+FROM node:22-alpine AS frontend-builder
+WORKDIR /app/frontend
 
-FROM node:20-bookworm-slim AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
-RUN npx prisma generate
+COPY frontend/package*.json ./
+RUN npm install
+
+COPY frontend/ ./
 RUN npm run build
 
-FROM node:20-bookworm-slim AS runner
+# ==========================================
+# Stage 2: Production Python Backend & SPA
+# ==========================================
+FROM python:3.11-slim AS runtime
+
 WORKDIR /app
-ENV NODE_ENV=production
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends openssl \
-  && rm -rf /var/lib/apt/lists/* \
-  && groupadd --system --gid 1001 nodejs \
-  && useradd --system --uid 1001 --gid nodejs nextjs
 
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
-COPY --from=builder --chown=nextjs:nodejs /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
-COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
-COPY --chown=nextjs:nodejs docker-entrypoint.sh ./docker-entrypoint.sh
+ENV PYTHONUNBUFFERED=1 \
+    STATIC_DIR=/app/static \
+    UPLOADS_DIR=/app/uploads
 
-RUN chmod +x docker-entrypoint.sh \
-  && mkdir -p uploads/tmp \
-  && chown -R nextjs:nodejs uploads
+RUN mkdir -p /app/uploads /app/data /app/static
 
-USER nextjs
-EXPOSE 3000
-ENV PORT=3000
+COPY backend/requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-  CMD ["node", "-e", "fetch('http://127.0.0.1:3000/login').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+COPY backend/app ./app
+COPY --from=frontend-builder /app/frontend/dist ./static
 
-ENTRYPOINT ["./docker-entrypoint.sh"]
+EXPOSE 8000
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

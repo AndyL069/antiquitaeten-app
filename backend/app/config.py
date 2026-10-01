@@ -1,6 +1,6 @@
 # backend/app/config.py
 from pathlib import Path
-from pydantic import field_validator
+from pydantic import field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -9,6 +9,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 class Settings(BaseSettings):
     SECRET_KEY: str = "antik-secret-key-change-in-production-2026"
     DATABASE_URL: str = f"sqlite:///{BASE_DIR}/antik.db"
+    
+    AUTH_SECRET: str = ""
     
     # Gemini AI
     GOOGLE_API_KEY: str = ""
@@ -25,6 +27,12 @@ class Settings(BaseSettings):
     STATIC_DIR: Path = BASE_DIR / "static"
     COOKIE_NAME: str = "access_token"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
+
+    @model_validator(mode="after")
+    def sync_auth_secret(self):
+        if self.SECRET_KEY == "antik-secret-key-change-in-production-2026" and self.AUTH_SECRET:
+            self.SECRET_KEY = self.AUTH_SECRET
+        return self
     
     # CORS
     CORS_ORIGINS: list[str] = [

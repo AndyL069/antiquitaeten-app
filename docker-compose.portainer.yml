@@ -16,9 +16,6 @@ services:
       retries: 10
 
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
     image: ghcr.io/andyl069/antiquitaeten-app:latest
     container_name: antiquitaeten-app
     restart: unless-stopped

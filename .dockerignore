@@ -1,7 +1,27 @@
-node_modules
-.next
 .git
-*.log
+.gitignore
 .env
 .env.*
 !.env.example
+*.log
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache
+backend/venv
+venv
+*.db
+backend/*.db
+
+# Node
+node_modules
+frontend/node_modules
+frontend/dist
+.next
+
+# Uploads & local data
+uploads
+backend/uploads

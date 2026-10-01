@@ -1,51 +1,65 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
-/node_modules
-/.pnp
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
-
-# testing
-/coverage
-
-# next.js
-/.next/
-/out/
-
-# production
-/build
-
-# misc
-.DS_Store
-*.pem
-
-# debug
+# Node / Frontend artifacts
+node_modules/
+frontend/node_modules/
+dist/
+frontend/dist/
+dist-ssr/
+*.local
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 .pnpm-debug.log*
+*.tsbuildinfo
 
-# env files (can opt-in for committing if needed)
-.env*
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+backend/venv/
+.pytest_cache/
+.coverage
+htmlcov/
+*.db
+*.sqlite
+*.sqlite3
+backend/*.db
+backend/*.sqlite
+backend/*.sqlite3
+
+# Uploads & Media
+uploads/
+backend/uploads/
+
+# Environment files
+.env
+.env.*
 !.env.example
 
-# vercel
-.vercel
+# IDE & OS artifacts
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.pem
 
-# typescript
-*.tsbuildinfo
+# Legacy Next.js artifacts
+.next/
+out/
 next-env.d.ts
 
-# uploads
-/uploads/
-.env
-
-# dev logs
+# Log files
+*.log
 dev.log
 dev.err.log
 prod.log
