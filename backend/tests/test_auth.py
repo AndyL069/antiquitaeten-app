@@ -264,4 +264,60 @@ def test_register_password_length_validation():
     })
     assert res_long.status_code == 422
 
+def test_authentik_callback_nextauth_path(monkeypatch):
+    """Verify both /callback/authentik and /authentik/callback resolve correctly."""
+    from app.services.authentik_service import authentik_service
+
+    async def mock_exchange(code: str, redirect_uri: str):
+        return {"access_token": "mocked-authentik-token"}
+
+    async def mock_user_info(access_token: str):
+        return {"email": "nextauth_path_user@antik.de", "name": "NextAuth Path User"}
+
+    monkeypatch.setattr(authentik_service, "exchange_code_for_token", mock_exchange)
+    monkeypatch.setattr(authentik_service, "get_user_info", mock_user_info)
+
+    # Call NextAuth standard path: /api/auth/callback/authentik
+    res = client.get(
+        "/api/auth/callback/authentik?code=valid-code&state=valid-state-456",
+        cookies={"oauth_state": "valid-state-456", "oauth_redirect": "/catalog"},
+        follow_redirects=False
+    )
+    assert res.status_code == 302
+    assert res.headers["location"] == "/catalog"
+    assert "access_token" in res.cookies
+
+def test_get_authentik_callback_url_resolution(monkeypatch):
+    from app.config import settings
+    from app.routes.auth import get_authentik_callback_url
+    from starlette.requests import Request
+
+    # 1. Default with proxy headers
+    scope = {
+        "type": "http",
+        "method": "GET",
+        "path": "/api/auth/authentik/login",
+        "headers": [
+            (b"host", b"antik.am-homelab.de"),
+            (b"x-forwarded-proto", b"https"),
+            (b"x-forwarded-host", b"antik.am-homelab.de"),
+        ],
+    }
+    req = Request(scope)
+    monkeypatch.setattr(settings, "AUTH_URL", "")
+    monkeypatch.setattr(settings, "AUTHENTIK_REDIRECT_URI", "")
+    url = get_authentik_callback_url(req)
+    assert url == "https://antik.am-homelab.de/api/auth/callback/authentik"
+
+    # 2. Overridden with AUTH_URL
+    monkeypatch.setattr(settings, "AUTH_URL", "https://custom.am-homelab.de")
+    url2 = get_authentik_callback_url(req)
+    assert url2 == "https://custom.am-homelab.de/api/auth/callback/authentik"
+
+    # 3. Explicit AUTHENTIK_REDIRECT_URI
+    monkeypatch.setattr(settings, "AUTHENTIK_REDIRECT_URI", "https://antik.am-homelab.de/api/custom/callback")
+    url3 = get_authentik_callback_url(req)
+    assert url3 == "https://antik.am-homelab.de/api/custom/callback"
+
+
 

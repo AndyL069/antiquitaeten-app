@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     DATABASE_URL: str = f"sqlite:///{BASE_DIR.as_posix()}/antik.db"
     
     AUTH_SECRET: str = ""
+    AUTH_URL: str = ""
     
     # Gemini AI
     GOOGLE_API_KEY: str = ""
@@ -21,6 +22,8 @@ class Settings(BaseSettings):
     AUTHENTIK_CLIENT_ID: str = ""
     AUTHENTIK_CLIENT_SECRET: str = ""
     AUTHENTIK_ISSUER: str = ""
+    AUTHENTIK_REDIRECT_URI: str = ""
+
     
     # Paths & Cookies
     UPLOADS_DIR: Path = BASE_DIR / "uploads"

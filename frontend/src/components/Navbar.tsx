@@ -69,7 +69,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span>Sammlungsstücke</span>
               </div>
               <div className="text-[11px] font-medium text-stone-500 tracking-wider uppercase">
-                Fitcast Catalog &amp; AI
+                Inventar &amp; Sammlungsverwaltung
               </div>
             </div>
           </div>
