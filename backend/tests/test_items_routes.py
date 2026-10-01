@@ -548,6 +548,43 @@ def test_locations_indirect_cycle_prevention():
     assert cycle_res.status_code == 400
     assert "Zyklische" in cycle_res.json()["detail"]
 
+def test_legacy_photo_path_normalization_and_serving(tmp_path, monkeypatch):
+    from app.schemas import PhotoResponse
+    from app.config import settings
+    from datetime import datetime
+
+    # 1. Test schema normalization
+    p1 = PhotoResponse(id="p1", itemId="item1", path="cm0dtx7yq/photo1.jpg", createdAt=datetime.utcnow())
+    assert p1.path == "/api/uploads/cm0dtx7yq/photo1.jpg"
+
+    # Windows path with backslashes
+    p2 = PhotoResponse(id="p2", itemId="item1", path="cm0dtx7yq\\photo1.jpg", createdAt=datetime.utcnow())
+    assert p2.path == "/api/uploads/cm0dtx7yq/photo1.jpg"
+
+    # Already prefixed path
+    p3 = PhotoResponse(id="p3", itemId="item1", path="/uploads/photo1.jpg", createdAt=datetime.utcnow())
+    assert p3.path == "/api/uploads/photo1.jpg"
+
+    # 2. Test serving of legacy subfolder upload
+    uploads_dir = tmp_path / "uploads"
+    item_sub = uploads_dir / "cm0dtx7yq"
+    item_sub.mkdir(parents=True)
+    img_file = item_sub / "photo1.jpg"
+    img_file.write_bytes(b"JPEG_MOCK_CONTENT")
+
+    monkeypatch.setattr(settings, "UPLOADS_DIR", uploads_dir)
+
+    # Serving via /api/uploads/cm0dtx7yq/photo1.jpg
+    res_api = client.get("/api/uploads/cm0dtx7yq/photo1.jpg")
+    assert res_api.status_code == 200
+    assert res_api.content == b"JPEG_MOCK_CONTENT"
+
+    # Direct fallback via /cm0dtx7yq/photo1.jpg
+    res_direct = client.get("/cm0dtx7yq/photo1.jpg")
+    assert res_direct.status_code == 200
+    assert res_direct.content == b"JPEG_MOCK_CONTENT"
+
+
 
 
 

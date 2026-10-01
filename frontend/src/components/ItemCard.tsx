@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { MapPin, Image as ImageIcon, Calendar } from 'lucide-react';
 import type { Item } from '../types';
+import { getPhotoUrl } from '../utils/formatters';
+
 
 export interface ItemCardProps {
   item: Item;
@@ -72,7 +74,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, onSelect }) => {
       <div className="relative aspect-[4/3] bg-stone-100 overflow-hidden flex items-center justify-center">
         {primaryPhoto && !imgError ? (
           <img
-            src={primaryPhoto.path}
+            src={getPhotoUrl(primaryPhoto.path)}
             alt={item.name}
             onError={() => setImgError(true)}
             loading="lazy"

@@ -1,5 +1,5 @@
-# backend/app/config.py
 from pathlib import Path
+from typing import Optional
 from pydantic import field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -27,15 +27,25 @@ class Settings(BaseSettings):
     
     # Paths & Cookies
     UPLOADS_DIR: Path = BASE_DIR / "uploads"
+    UPLOAD_DIR: Optional[str] = None
     STATIC_DIR: Path = BASE_DIR / "static"
     COOKIE_NAME: str = "access_token"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
 
     @model_validator(mode="after")
-    def sync_auth_secret(self):
+    def sync_config(self):
         if self.SECRET_KEY == "antik-secret-key-change-in-production-2026" and self.AUTH_SECRET:
             self.SECRET_KEY = self.AUTH_SECRET
+        if self.UPLOAD_DIR:
+            p = Path(self.UPLOAD_DIR)
+            if p.is_absolute():
+                self.UPLOADS_DIR = p
+            elif (BASE_DIR.parent / self.UPLOAD_DIR).is_dir():
+                self.UPLOADS_DIR = BASE_DIR.parent / self.UPLOAD_DIR
+            else:
+                self.UPLOADS_DIR = BASE_DIR / self.UPLOAD_DIR
         return self
+
     
     # CORS
     CORS_ORIGINS: list[str] = [

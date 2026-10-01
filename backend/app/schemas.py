@@ -1,7 +1,8 @@
 # backend/app/schemas.py
 from datetime import datetime
 from typing import Optional, List
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
+
 
 # ==========================================
 # User & Auth Schemas
@@ -85,6 +86,25 @@ class PhotoResponse(PhotoBase):
     createdAt: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+    @field_validator("path", mode="after")
+    @classmethod
+    def normalize_photo_path(cls, v: str) -> str:
+        if not v:
+            return ""
+        clean = v.replace("\\", "/").strip()
+        if clean.startswith("http://") or clean.startswith("https://"):
+            return clean
+        if clean.startswith("/api/uploads/"):
+            return clean
+        if clean.startswith("/uploads/"):
+            return f"/api{clean}"
+        if clean.startswith("api/uploads/"):
+            return f"/{clean}"
+        if clean.startswith("uploads/"):
+            return f"/api/{clean}"
+        return f"/api/uploads/{clean.lstrip('/')}"
+
 
 # ==========================================
 # Appraisal Schemas

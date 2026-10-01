@@ -330,13 +330,30 @@ def delete_item(
 
     # Remove photo files from uploads directory
     for photo in item.photos:
-        filename = Path(photo.path).name
-        filepath = settings.UPLOADS_DIR / filename
+        clean_rel = photo.path.replace("\\", "/").lstrip("/")
+        if clean_rel.startswith("api/uploads/"):
+            clean_rel = clean_rel[12:]
+        elif clean_rel.startswith("uploads/"):
+            clean_rel = clean_rel[8:]
+
+        filepath = settings.UPLOADS_DIR / clean_rel
         if filepath.exists() and filepath.is_file():
             try:
                 filepath.unlink()
             except OSError:
                 pass
+        else:
+            fallback = settings.UPLOADS_DIR / Path(photo.path).name
+            if fallback.exists() and fallback.is_file():
+                try:
+                    fallback.unlink()
+                except OSError:
+                    pass
+
+    item_dir = settings.UPLOADS_DIR / id
+    if item_dir.exists() and item_dir.is_dir():
+        import shutil
+        shutil.rmtree(item_dir, ignore_errors=True)
 
     db.delete(item)
     db.commit()
@@ -401,13 +418,14 @@ async def upload_item_photo(
 
     new_photo = Photo(
         itemId=id,
-        path=f"/uploads/{filename}",
+        path=filename,
         isPrimary=is_primary
     )
     db.add(new_photo)
     db.commit()
     db.refresh(new_photo)
     return new_photo
+
 
 
 @router.put("/api/photos/{id}/primary", response_model=PhotoResponse)
@@ -452,13 +470,26 @@ def delete_photo(
     was_primary = photo.isPrimary
 
     # Delete physical file
-    filename = Path(photo.path).name
-    filepath = settings.UPLOADS_DIR / filename
+    clean_rel = photo.path.replace("\\", "/").lstrip("/")
+    if clean_rel.startswith("api/uploads/"):
+        clean_rel = clean_rel[12:]
+    elif clean_rel.startswith("uploads/"):
+        clean_rel = clean_rel[8:]
+
+    filepath = settings.UPLOADS_DIR / clean_rel
     if filepath.exists() and filepath.is_file():
         try:
             filepath.unlink()
         except OSError:
             pass
+    else:
+        fallback = settings.UPLOADS_DIR / Path(photo.path).name
+        if fallback.exists() and fallback.is_file():
+            try:
+                fallback.unlink()
+            except OSError:
+                pass
+
 
     # If the deleted photo was primary, make the next photo primary
     if was_primary:

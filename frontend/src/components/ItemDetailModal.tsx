@@ -19,6 +19,8 @@ import {
 import type { Item } from '../types';
 import { CURRENCIES } from '../types';
 import api from '../services/api';
+import { getPhotoUrl } from '../utils/formatters';
+
 
 export interface ItemDetailModalProps {
   isOpen: boolean;
@@ -281,7 +283,7 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                 {currentPhoto ? (
                   <>
                     <img
-                      src={currentPhoto.path}
+                      src={getPhotoUrl(currentPhoto.path)}
                       alt={item.name}
                       className="w-full h-full object-contain bg-stone-900/5"
                     />
@@ -338,7 +340,7 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                         : 'border-stone-200 opacity-70 hover:opacity-100'
                     }`}
                   >
-                    <img src={p.path} alt="" className="w-full h-full object-cover" />
+                    <img src={getPhotoUrl(p.path)} alt="" className="w-full h-full object-cover" />
                     {p.isPrimary && (
                       <span className="absolute bottom-0 inset-x-0 bg-amber-800 text-[8px] text-white font-bold text-center py-0.5">
                         Haupt

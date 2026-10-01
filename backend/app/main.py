@@ -114,9 +114,26 @@ app.add_middleware(
 def healthcheck():
     return {"status": "ok"}
 
-# Mount uploaded files directory
-app.mount("/uploads", StaticFiles(directory=str(settings.UPLOADS_DIR), check_dir=False), name="uploads")
-app.mount("/api/uploads", StaticFiles(directory=str(settings.UPLOADS_DIR), check_dir=False), name="api_uploads")
+# Serve uploaded files dynamically with subfolder & fallback support
+@app.get("/uploads/{file_path:path}")
+@app.get("/api/uploads/{file_path:path}")
+async def serve_uploaded_file(file_path: str):
+    clean_path = file_path.replace("\\", "/").lstrip("/")
+    uploads_root = settings.UPLOADS_DIR.resolve()
+    try:
+        target = (settings.UPLOADS_DIR / clean_path).resolve()
+        if target.is_file() and target.is_relative_to(uploads_root):
+            return FileResponse(target)
+
+        # Fallback to filename in root of UPLOADS_DIR if path was nested or vice-versa
+        fallback = (settings.UPLOADS_DIR / Path(clean_path).name).resolve()
+        if fallback.is_file() and fallback.is_relative_to(uploads_root):
+            return FileResponse(fallback)
+    except (ValueError, RuntimeError):
+        pass
+
+    return JSONResponse({"detail": "Not Found"}, status_code=404)
+
 
 # Include API routers
 app.include_router(auth.router)
@@ -132,6 +149,17 @@ async def serve_spa(full_path: str):
     """Serve static frontend files or SPA index.html fallback with path traversal protection."""
     if full_path.startswith("api/") or full_path.startswith("uploads/"):
         return JSONResponse({"detail": "Not Found"}, status_code=404)
+
+    # Fallback for direct upload paths (e.g. legacy <itemId>/<photo>.jpg without /api/uploads prefix)
+    if settings.UPLOADS_DIR.exists() and settings.UPLOADS_DIR.is_dir():
+        try:
+            clean_rel = full_path.replace("\\", "/").lstrip("/")
+            uploads_root = settings.UPLOADS_DIR.resolve()
+            upload_target = (settings.UPLOADS_DIR / clean_rel).resolve()
+            if upload_target.is_file() and upload_target.is_relative_to(uploads_root):
+                return FileResponse(upload_target)
+        except (ValueError, RuntimeError):
+            pass
 
     if settings.STATIC_DIR.exists() and settings.STATIC_DIR.is_dir():
         try:
