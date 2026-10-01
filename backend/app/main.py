@@ -1,4 +1,7 @@
 # backend/app/main.py
+import asyncio
+import logging
+import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 from fastapi import FastAPI, Request
@@ -10,12 +13,83 @@ from app.config import settings
 from app.database import Base, engine
 from app.routes import auth, items, locations, appraisals, sales, users
 
+logger = logging.getLogger("uvicorn.error")
+
+async def _start_port_forwarder(from_port: int, to_port: int):
+    """Forward TCP traffic from an alternate port to the active server port."""
+    async def forward_stream(reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
+        try:
+            remote_reader, remote_writer = await asyncio.open_connection("127.0.0.1", to_port)
+        except Exception:
+            writer.close()
+            await writer.wait_closed()
+            return
+
+        async def pipe(r: asyncio.StreamReader, w: asyncio.StreamWriter):
+            try:
+                while True:
+                    data = await r.read(65536)
+                    if not data:
+                        break
+                    w.write(data)
+                    await w.drain()
+            except Exception:
+                pass
+            finally:
+                try:
+                    w.close()
+                    await w.wait_closed()
+                except Exception:
+                    pass
+
+        await asyncio.gather(pipe(reader, remote_writer), pipe(remote_reader, writer))
+
+    try:
+        server = await asyncio.start_server(forward_stream, "0.0.0.0", from_port)
+        logger.info(f"Dual-port forwarder listening on 0.0.0.0:{from_port} -> 127.0.0.1:{to_port}")
+        return server
+    except Exception as e:
+        logger.debug(f"Dual-port forwarder {from_port} -> {to_port} skipped: {e}")
+        return None
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Ensure database schema is created
-    Base.metadata.create_all(bind=engine)
+    # Ensure database schema is created with retry mechanism
+    retries = 5
+    for attempt in range(1, retries + 1):
+        try:
+            Base.metadata.create_all(bind=engine)
+            logger.info("Database schema verified/created successfully.")
+            break
+        except Exception as e:
+            logger.warning(f"Database connection attempt {attempt}/{retries} failed: {e}")
+            if attempt == retries:
+                logger.error(f"Could not connect to database after {retries} retries: {e}")
+                # Don't hard-crash process so container remains up for logs/healthcheck
+            else:
+                await asyncio.sleep(2)
+
     settings.UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
+
+    # Start optional dual-port forwarder (supporting both 3000 and 8000)
+    forwarder_server = None
+    try:
+        port_env = int(os.environ.get("PORT", "3000"))
+        alt_port = 8000 if port_env == 3000 else (3000 if port_env == 8000 else None)
+        if alt_port:
+            forwarder_server = await _start_port_forwarder(alt_port, port_env)
+    except Exception as e:
+        logger.debug(f"Could not start dual-port forwarder: {e}")
+
     yield
+
+    if forwarder_server:
+        forwarder_server.close()
+        try:
+            await forwarder_server.wait_closed()
+        except Exception:
+            pass
+
 
 app = FastAPI(
     title="Antiquitäten-App API",

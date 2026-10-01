@@ -19,7 +19,8 @@ WORKDIR /app
 
 ENV PYTHONUNBUFFERED=1 \
     STATIC_DIR=/app/static \
-    UPLOADS_DIR=/app/uploads
+    UPLOADS_DIR=/app/uploads \
+    PORT=3000
 
 RUN mkdir -p /app/uploads /app/data /app/static
 
@@ -29,6 +30,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/app ./app
 COPY --from=frontend-builder /app/frontend/dist ./static
 
-EXPOSE 8000
+EXPOSE 3000 8000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-3000}"]
+

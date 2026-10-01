@@ -36,9 +36,9 @@ services:
       AUTHENTIK_ISSUER: ${AUTHENTIK_ISSUER}
       AUTHENTIK_CLIENT_ID: ${AUTHENTIK_CLIENT_ID}
       AUTHENTIK_CLIENT_SECRET: ${AUTHENTIK_CLIENT_SECRET}
-      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3003,http://localhost:3000}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3003,http://localhost:3000,https://antik.am-homelab.de}
     ports:
-      - "3003:8000"
+      - "${PORT:-3003}:3000"
     volumes:
       - uploads_data:/app/uploads
 
