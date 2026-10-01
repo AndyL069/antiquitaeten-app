@@ -407,16 +407,16 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="px-6 py-4 bg-slate-900 text-white flex items-center justify-between flex-shrink-0">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-slate-800 rounded-lg text-slate-200">
+        <div className="px-4 py-3 sm:px-6 sm:py-4 bg-slate-900 text-white flex items-center justify-between gap-3 flex-shrink-0">
+          <div className="flex items-center space-x-2.5 sm:space-x-3 min-w-0 flex-1">
+            <div className="p-2 bg-slate-800 rounded-lg text-slate-200 flex-shrink-0">
               <Sparkles className="w-5 h-5 text-slate-300" />
             </div>
-            <div>
-              <h2 className="text-xl font-serif font-bold tracking-tight">
-                {isEditMode ? 'Objekt bearbeiten' : 'Neues Antiquitäten-Objekt anlegen'}
+            <div className="min-w-0 flex-1">
+              <h2 className="text-base sm:text-xl font-serif font-bold tracking-tight truncate">
+                {isEditMode ? 'Objekt bearbeiten' : 'Neues Objekt erfassen'}
               </h2>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-400 truncate">
                 {isEditMode ? persistedItem?.name || name : 'Fotos hochladen, mit KI scannen oder manuell erfassen'}
               </p>
             </div>
@@ -424,7 +424,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors flex-shrink-0"
             title="Schließen"
           >
             <X className="w-5 h-5" />

@@ -235,36 +235,37 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
   const sales = item.sales || [];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in overflow-y-auto">
       <div
-        className="relative w-full max-w-5xl bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[94vh] my-auto"
+        className="relative w-full max-w-5xl bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[96vh] sm:max-h-[94vh] my-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="px-6 py-4 bg-slate-900 text-white flex items-center justify-between flex-shrink-0">
-          <div className="flex items-center space-x-3">
+        <div className="px-4 py-3 sm:px-6 sm:py-4 bg-slate-900 text-white flex items-start justify-between gap-3 flex-shrink-0">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3 min-w-0 flex-1">
             {item.inventoryNumber && (
-              <span className="px-2.5 py-1 bg-slate-800 text-slate-200 font-mono text-xs font-semibold rounded-lg border border-slate-700">
+              <span className="self-start px-2 py-0.5 sm:px-2.5 sm:py-1 bg-slate-800 text-slate-200 font-mono text-[11px] sm:text-xs font-semibold rounded-md border border-slate-700 whitespace-nowrap flex-shrink-0">
                 {item.inventoryNumber}
               </span>
             )}
-            <h2 className="text-lg sm:text-xl font-serif font-bold tracking-tight truncate max-w-xl">
+            <h2 className="text-base sm:text-xl font-serif font-bold tracking-tight break-words text-white leading-snug">
               {item.name}
             </h2>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-1.5 sm:space-x-2 flex-shrink-0 pt-0.5">
             <button
               type="button"
               onClick={() => onEdit(item)}
-              className="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-medium shadow transition-colors"
+              className="flex items-center space-x-1.5 px-2.5 sm:px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-medium shadow transition-colors"
+              title="Objekt bearbeiten"
             >
               <Edit3 className="w-3.5 h-3.5" />
-              <span>Bearbeiten</span>
+              <span className="hidden sm:inline">Bearbeiten</span>
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="p-1.5 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+              className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
               title="Schließen"
             >
               <X className="w-5 h-5" />
@@ -273,7 +274,7 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
         </div>
 
         {/* Modal Body - Scrollable */}
-        <div className="overflow-y-auto p-6 space-y-8 flex-1">
+        <div className="overflow-y-auto p-4 sm:p-6 space-y-8 flex-1">
           {/* Top Section: Photo Gallery + Key Overview */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             {/* Gallery Column (7 cols) */}

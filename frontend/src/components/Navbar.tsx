@@ -58,17 +58,17 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Brand Logo */}
-          <div className="flex items-center space-x-3 cursor-pointer" onClick={() => onTabChange('catalog')}>
-            <div className="w-9 h-9 rounded-lg bg-slate-900 flex items-center justify-center text-white shadow-sm">
+          <div className="flex items-center space-x-2.5 sm:space-x-3 cursor-pointer min-w-0" onClick={() => onTabChange('catalog')}>
+            <div className="w-9 h-9 rounded-lg bg-slate-900 flex items-center justify-center text-white shadow-sm flex-shrink-0">
               <Landmark className="w-5 h-5 text-slate-100" />
             </div>
-            <div>
-              <div className="text-lg font-bold tracking-tight text-slate-900 leading-tight flex items-center gap-1.5">
+            <div className="min-w-0">
+              <div className="text-base sm:text-lg font-bold tracking-tight text-slate-900 leading-tight flex items-center gap-1 sm:gap-1.5 truncate">
                 <span className="font-serif">Antiquitäten</span>
                 <span className="text-slate-500 font-serif italic">&amp;</span>
                 <span className="font-serif">Sammlungsstücke</span>
               </div>
-              <div className="text-[10px] font-semibold text-slate-500 tracking-widest uppercase">
+              <div className="text-[9px] sm:text-[10px] font-semibold text-slate-500 tracking-wider sm:tracking-widest uppercase truncate">
                 Inventar &amp; Sammlungsverwaltung
               </div>
             </div>

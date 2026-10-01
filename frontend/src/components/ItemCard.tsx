@@ -133,7 +133,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, onSelect }) => {
           </div>
 
           {/* Name */}
-          <h3 className="font-serif font-semibold text-slate-900 text-base group-hover:text-slate-700 transition-colors line-clamp-1 mb-1">
+          <h3 className="font-serif font-semibold text-slate-900 text-base group-hover:text-slate-700 transition-colors line-clamp-2 leading-snug mb-1">
             {item.name}
           </h3>
 
