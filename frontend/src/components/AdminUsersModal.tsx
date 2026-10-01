@@ -99,20 +99,20 @@ export const AdminUsersModal: React.FC<AdminUsersModalProps> = ({ isOpen, onClos
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in overflow-hidden">
       <div
-        className="relative w-full max-w-3xl bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh] my-auto"
+        className="relative w-full max-w-3xl bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col h-[calc(100dvh-1.5rem)] sm:h-auto sm:max-h-[90vh] my-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="px-6 py-4 bg-slate-900 text-white flex items-center justify-between flex-shrink-0">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-slate-800 text-slate-200 rounded-lg">
+        <div className="px-4 py-3 sm:px-6 sm:py-4 bg-slate-900 text-white flex items-center justify-between flex-shrink-0">
+          <div className="flex items-center space-x-3 min-w-0 flex-1">
+            <div className="p-2 bg-slate-800 text-slate-200 rounded-lg flex-shrink-0">
               <Users className="w-5 h-5" />
             </div>
-            <div>
-              <h2 className="font-serif text-lg font-bold tracking-tight">Benutzerverwaltung</h2>
-              <p className="text-xs text-slate-400">Rollen verwalten und Zugänge steuern (Admin)</p>
+            <div className="min-w-0 flex-1">
+              <h2 className="font-serif text-base sm:text-lg font-bold tracking-tight truncate">Benutzerverwaltung</h2>
+              <p className="text-xs text-slate-400 truncate">Rollen verwalten und Zugänge steuern (Admin)</p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
@@ -152,7 +152,7 @@ export const AdminUsersModal: React.FC<AdminUsersModalProps> = ({ isOpen, onClos
         )}
 
         {/* User Table - Scrollable */}
-        <div className="overflow-y-auto p-6 flex-1">
+        <div className="overflow-y-auto p-4 sm:p-6 flex-1 overscroll-contain">
           {loading && users.length === 0 ? (
             <div className="py-12 text-center text-slate-400">
               <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2 text-slate-600" />
@@ -245,7 +245,7 @@ export const AdminUsersModal: React.FC<AdminUsersModalProps> = ({ isOpen, onClos
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex justify-end flex-shrink-0">
+        <div className="px-4 py-3 sm:px-6 sm:py-3.5 bg-slate-50 border-t border-slate-200 flex justify-end flex-shrink-0">
           <button
             type="button"
             onClick={onClose}

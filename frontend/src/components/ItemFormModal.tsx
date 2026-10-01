@@ -401,9 +401,9 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in overflow-hidden">
       <div
-        className="relative w-full max-w-4xl bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh] my-auto"
+        className="relative w-full max-w-4xl bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col h-[calc(100dvh-1rem)] sm:h-auto sm:max-h-[92vh] my-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
@@ -432,7 +432,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
         </div>
 
         {/* AI & Photo Banner Section */}
-        <div className="p-6 bg-slate-50 border-b border-slate-200 space-y-4 flex-shrink-0">
+        <div className="p-3.5 sm:p-6 bg-slate-50 border-b border-slate-200 space-y-3 sm:space-y-4 flex-shrink-0">
           {/* Photo Dropzone */}
           <div
             onDragEnter={handleDrag}
@@ -553,11 +553,11 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex border-b border-slate-200 bg-white px-6 flex-shrink-0">
+        <div className="flex border-b border-slate-200 bg-white px-3 sm:px-6 flex-shrink-0 overflow-x-auto">
           <button
             type="button"
             onClick={() => setActiveTab('basic')}
-            className={`py-3 px-4 text-xs font-semibold uppercase tracking-wider border-b-2 transition-all flex items-center space-x-2 ${
+            className={`py-3 px-4 text-xs font-semibold uppercase tracking-wider border-b-2 transition-all flex items-center space-x-2 whitespace-nowrap ${
               activeTab === 'basic'
                 ? 'border-slate-900 text-slate-900 bg-slate-50'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
@@ -570,7 +570,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
           <button
             type="button"
             onClick={() => setActiveTab('text')}
-            className={`py-3 px-4 text-xs font-semibold uppercase tracking-wider border-b-2 transition-all flex items-center space-x-2 ${
+            className={`py-3 px-4 text-xs font-semibold uppercase tracking-wider border-b-2 transition-all flex items-center space-x-2 whitespace-nowrap ${
               activeTab === 'text'
                 ? 'border-slate-900 text-slate-900 bg-slate-50'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
@@ -583,7 +583,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
           <button
             type="button"
             onClick={() => setActiveTab('book')}
-            className={`py-3 px-4 text-xs font-semibold uppercase tracking-wider border-b-2 transition-all flex items-center space-x-2 ${
+            className={`py-3 px-4 text-xs font-semibold uppercase tracking-wider border-b-2 transition-all flex items-center space-x-2 whitespace-nowrap ${
               activeTab === 'book'
                 ? 'border-slate-900 text-slate-900 bg-slate-50'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
@@ -599,7 +599,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
           <button
             type="button"
             onClick={() => setActiveTab('ebay')}
-            className={`py-3 px-4 text-xs font-semibold uppercase tracking-wider border-b-2 transition-all flex items-center space-x-2 ${
+            className={`py-3 px-4 text-xs font-semibold uppercase tracking-wider border-b-2 transition-all flex items-center space-x-2 whitespace-nowrap ${
               activeTab === 'ebay'
                 ? 'border-slate-900 text-slate-900 bg-slate-50'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
@@ -611,7 +611,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
         </div>
 
         {/* Form Body - Scrollable */}
-        <form id="item-form" onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-6 flex-1">
+        <form id="item-form" onSubmit={handleSubmit} className="p-4 sm:p-6 overflow-y-auto space-y-6 flex-1 overscroll-contain">
           {/* TAB 1: Basisdaten & Details */}
           {activeTab === 'basic' && (
             <div className="space-y-4">
@@ -1022,7 +1022,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
         </form>
 
         {/* Modal Footer */}
-        <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between flex-shrink-0">
+        <div className="px-4 py-3 sm:px-6 sm:py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between flex-shrink-0">
           <div className="text-xs text-slate-500 font-medium">
             {savingProgress && (
               <span className="flex items-center space-x-1.5 text-slate-800">
@@ -1032,12 +1032,12 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
             )}
           </div>
 
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2 sm:space-x-3">
             <button
               type="button"
               onClick={onClose}
               disabled={isSaving}
-              className="px-4 py-2 text-slate-700 hover:text-slate-900 text-sm font-medium transition-colors"
+              className="px-3 sm:px-4 py-2 text-slate-700 hover:text-slate-900 text-xs sm:text-sm font-medium transition-colors"
             >
               Abbrechen
             </button>
@@ -1046,7 +1046,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
               type="submit"
               form="item-form"
               disabled={isSaving || isAnalyzing}
-              className="flex items-center space-x-2 px-6 py-2.5 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-300 text-white font-medium rounded-lg shadow-sm transition-colors"
+              className="flex items-center space-x-2 px-4 sm:px-6 py-2 sm:py-2.5 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-300 text-white text-xs sm:text-sm font-medium rounded-lg shadow-sm transition-colors"
             >
               {isSaving ? (
                 <>

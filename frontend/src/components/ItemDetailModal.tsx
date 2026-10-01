@@ -235,9 +235,9 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
   const sales = item.sales || [];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in overflow-hidden">
       <div
-        className="relative w-full max-w-5xl bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[96vh] sm:max-h-[94vh] my-auto"
+        className="relative w-full max-w-5xl bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col h-[calc(100dvh-1rem)] sm:h-auto sm:max-h-[90vh] my-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -274,7 +274,7 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
         </div>
 
         {/* Modal Body - Scrollable */}
-        <div className="overflow-y-auto p-4 sm:p-6 space-y-8 flex-1">
+        <div className="overflow-y-auto p-4 sm:p-6 space-y-6 sm:space-y-8 flex-1 overscroll-contain">
           {/* Top Section: Photo Gallery + Key Overview */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             {/* Gallery Column (7 cols) */}
@@ -911,11 +911,11 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between flex-shrink-0">
+        <div className="px-4 py-3 sm:px-6 sm:py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between flex-shrink-0">
           <button
             type="button"
             onClick={() => setConfirmDeleteModal(true)}
-            className="flex items-center space-x-1.5 px-3.5 py-2 text-rose-600 hover:bg-rose-50 rounded-lg text-xs font-medium transition-colors"
+            className="flex items-center space-x-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 text-rose-600 hover:bg-rose-50 rounded-lg text-xs font-medium transition-colors"
           >
             <Trash2 className="w-4 h-4" />
             <span>Objekt löschen</span>
@@ -925,7 +925,7 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-medium rounded-lg transition-colors"
+              className="px-5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-semibold rounded-lg transition-colors"
             >
               Schließen
             </button>
