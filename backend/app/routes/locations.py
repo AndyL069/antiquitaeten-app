@@ -180,10 +180,20 @@ def update_location(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail="Übergeordneter Standort nicht gefunden"
                 )
+            # Cycle prevention: verify p_id is not a descendant of id
+            curr = parent
+            while curr:
+                if curr.id == id:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail="Zyklische Standort-Hierarchie ist nicht erlaubt"
+                    )
+                curr = db.query(Location).filter(Location.id == curr.parentId).first() if curr.parentId else None
         loc.parentId = p_id
 
     db.commit()
     db.refresh(loc)
+
     item_count = db.query(Item).filter(Item.locationId == id).count()
 
     return LocationResponse(

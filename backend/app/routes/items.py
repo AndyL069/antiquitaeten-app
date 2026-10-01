@@ -5,8 +5,10 @@ import uuid
 from pathlib import Path
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query, Request, UploadFile, File
-from sqlalchemy.orm import Session, joinedload
+from starlette.concurrency import run_in_threadpool
+from sqlalchemy.orm import Session, joinedload, selectinload
 from sqlalchemy import or_
+
 
 from app.config import settings
 from app.database import get_db
@@ -80,12 +82,13 @@ def get_items(
         db.query(Item)
         .options(
             joinedload(Item.location),
-            joinedload(Item.photos),
-            joinedload(Item.appraisals),
-            joinedload(Item.sales),
             joinedload(Item.createdBy),
+            selectinload(Item.photos),
+            selectinload(Item.appraisals),
+            selectinload(Item.sales),
         )
     )
+
 
     if q and q.strip():
         term = f"%{q.strip()}%"
@@ -226,7 +229,8 @@ async def analyze_item_images(
             detail="Keine Bilder zur Analyse übergeben"
         )
 
-    return gemini_service.extract_item_details_from_images(images)
+    return await run_in_threadpool(gemini_service.extract_item_details_from_images, images)
+
 
 
 # ==========================================
@@ -244,14 +248,15 @@ def get_item(
         db.query(Item)
         .options(
             joinedload(Item.location),
-            joinedload(Item.photos),
-            joinedload(Item.appraisals),
-            joinedload(Item.sales),
             joinedload(Item.createdBy),
+            selectinload(Item.photos),
+            selectinload(Item.appraisals),
+            selectinload(Item.sales),
         )
         .filter(Item.id == id)
         .first()
     )
+
     if not item:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -455,14 +460,19 @@ def delete_photo(
         except OSError:
             pass
 
+    # If the deleted photo was primary, make the next photo primary
+    if was_primary:
+        next_photo = (
+            db.query(Photo)
+            .filter(Photo.itemId == item_id, Photo.id != id)
+            .order_by(Photo.createdAt.asc())
+            .first()
+        )
+        if next_photo:
+            next_photo.isPrimary = True
+
     db.delete(photo)
     db.commit()
 
-    # If the deleted photo was primary, make the next photo primary
-    if was_primary:
-        next_photo = db.query(Photo).filter(Photo.itemId == item_id).order_by(Photo.createdAt.asc()).first()
-        if next_photo:
-            next_photo.isPrimary = True
-            db.commit()
-
     return {"ok": True}
+

@@ -29,7 +29,7 @@ app = FastAPI(
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -53,21 +53,26 @@ app.include_router(appraisals.router)
 app.include_router(sales.router)
 app.include_router(users.router)
 
-# Mount frontend production SPA if static directory exists
-if settings.STATIC_DIR.exists() and settings.STATIC_DIR.is_dir():
-    assets_dir = settings.STATIC_DIR / "assets"
-    if assets_dir.exists() and assets_dir.is_dir():
-        app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="assets")
+# SPA Fallback and Static Serving
+@app.get("/{full_path:path}")
+async def serve_spa(full_path: str):
+    """Serve static frontend files or SPA index.html fallback with path traversal protection."""
+    if full_path.startswith("api/") or full_path.startswith("uploads/"):
+        return JSONResponse({"detail": "Not Found"}, status_code=404)
 
-    index_file = settings.STATIC_DIR / "index.html"
+    if settings.STATIC_DIR.exists() and settings.STATIC_DIR.is_dir():
+        try:
+            static_root = settings.STATIC_DIR.resolve()
+            target = (settings.STATIC_DIR / full_path).resolve()
+            if target.is_file() and target.is_relative_to(static_root):
+                return FileResponse(target)
+        except (ValueError, RuntimeError):
+            pass
 
-    @app.get("/{full_path:path}")
-    async def serve_spa(full_path: str):
-        if full_path.startswith("api/") or full_path.startswith("uploads/"):
-            return JSONResponse({"detail": "Not Found"}, status_code=404)
-        target = settings.STATIC_DIR / full_path
-        if target.exists() and target.is_file():
-            return FileResponse(target)
+        index_file = settings.STATIC_DIR / "index.html"
         if index_file.exists():
             return FileResponse(index_file)
-        return JSONResponse({"detail": "Not Found"}, status_code=404)
+
+    return JSONResponse({"detail": "Not Found"}, status_code=404)
+
+

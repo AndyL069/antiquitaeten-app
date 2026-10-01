@@ -473,12 +473,14 @@ def test_healthcheck_cors_and_static(tmp_path, monkeypatch):
     assert health_res.status_code == 200
     assert health_res.json() == {"status": "ok"}
 
-    # 2. CORS headers
-    cors_res = client.options("/api/health", headers={
-        "Origin": "http://localhost:3000",
-        "Access-Control-Request-Method": "GET"
-    })
-    assert cors_res.headers.get("access-control-allow-origin") == "http://localhost:3000" or cors_res.headers.get("access-control-allow-origin") == "*"
+    # 2. CORS headers with credentials
+    for origin in ["http://localhost:3000", "http://localhost:5173"]:
+        cors_res = client.options("/api/health", headers={
+            "Origin": origin,
+            "Access-Control-Request-Method": "GET"
+        })
+        assert cors_res.headers.get("access-control-allow-origin") == origin
+        assert cors_res.headers.get("access-control-allow-credentials") == "true"
 
     # 3. Static uploads serving
     test_file = settings.UPLOADS_DIR / "static_test.txt"
@@ -494,6 +496,58 @@ def test_healthcheck_cors_and_static(tmp_path, monkeypatch):
     finally:
         if test_file.exists():
             test_file.unlink()
+
+def test_spa_path_traversal_prevention(tmp_path, monkeypatch):
+    from app.config import settings
+
+    # Create dummy static directory
+    static_dir = tmp_path / "static"
+    static_dir.mkdir()
+    index_file = static_dir / "index.html"
+    index_file.write_text("<html><body>SPA Index</body></html>", encoding="utf-8")
+    legit_file = static_dir / "app.js"
+    legit_file.write_text("console.log('app');", encoding="utf-8")
+
+    monkeypatch.setattr(settings, "STATIC_DIR", static_dir)
+
+    # Legitimate static asset should be served
+    res_legit = client.get("/app.js")
+    assert res_legit.status_code == 200
+    assert res_legit.text == "console.log('app');"
+
+    # SPA route fallback should serve index.html
+    res_spa = client.get("/catalog")
+    assert res_spa.status_code == 200
+    assert "SPA Index" in res_spa.text
+
+    # Path traversal attempts must NOT escape STATIC_DIR
+    res_escape1 = client.get("/..%2Fapp%2Fconfig.py")
+    assert "SECRET_KEY" not in res_escape1.text
+
+    res_escape2 = client.get("/..%2F..%2Frequirements.txt")
+    assert "fastapi" not in res_escape2.text
+
+def test_locations_indirect_cycle_prevention():
+    reg = client.post("/api/auth/register", json={
+        "email": "cycle_tester@antik.de", "password": "password123"
+    })
+    cookies = reg.cookies
+
+    # Create A -> B -> C hierarchy
+    res_a = client.post("/api/locations", json={"name": "Standort A"}, cookies=cookies)
+    id_a = res_a.json()["id"]
+
+    res_b = client.post("/api/locations", json={"name": "Standort B", "parentId": id_a}, cookies=cookies)
+    id_b = res_b.json()["id"]
+
+    res_c = client.post("/api/locations", json={"name": "Standort C", "parentId": id_b}, cookies=cookies)
+    id_c = res_c.json()["id"]
+
+    # Attempt to set A's parent to C (would create cycle: A -> B -> C -> A)
+    cycle_res = client.put(f"/api/locations/{id_a}", json={"parentId": id_c}, cookies=cookies)
+    assert cycle_res.status_code == 400
+    assert "Zyklische" in cycle_res.json()["detail"]
+
 
 
 
