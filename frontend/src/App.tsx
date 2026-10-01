@@ -139,7 +139,7 @@ function MainApp() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-100/70 text-stone-900 flex flex-col font-sans selection:bg-amber-800 selection:text-white">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-slate-900 selection:text-white">
       {/* Top Sticky Navbar */}
       <Navbar
         activeTab={activeTab}
@@ -152,22 +152,22 @@ function MainApp() {
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {authLoading ? (
-          <div className="flex flex-col items-center justify-center min-h-[50vh] text-stone-400">
-            <Loader2 className="w-10 h-10 animate-spin text-amber-800 mb-3" />
-            <p className="text-sm font-medium">Antiquitäten-Katalog wird initialisiert...</p>
+          <div className="flex flex-col items-center justify-center min-h-[50vh] text-slate-400">
+            <Loader2 className="w-10 h-10 animate-spin text-slate-800 mb-3" />
+            <p className="text-sm font-medium text-slate-600">Antiquitäten-Katalog wird initialisiert...</p>
           </div>
         ) : !isAuthenticated ? (
           /* Unauthenticated Landing / Welcome State */
-          <div className="max-w-2xl mx-auto my-12 bg-white rounded-3xl p-8 sm:p-10 border border-stone-200 shadow-xl text-center space-y-6">
-            <div className="w-20 h-20 bg-gradient-to-tr from-amber-800 to-amber-600 rounded-3xl flex items-center justify-center text-white mx-auto shadow-lg shadow-amber-800/20">
-              <Landmark className="w-10 h-10" />
+          <div className="max-w-2xl mx-auto my-12 bg-white rounded-2xl p-8 sm:p-10 border border-slate-200 shadow-sm text-center space-y-6">
+            <div className="w-16 h-16 bg-slate-900 rounded-2xl flex items-center justify-center text-white mx-auto shadow-sm">
+              <Landmark className="w-8 h-8 text-slate-100" />
             </div>
 
             <div className="space-y-2">
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900 tracking-tight">
                 Antiquitäten &amp; Sammlungsstücke
               </h1>
-              <p className="text-sm text-stone-600 max-w-md mx-auto leading-relaxed">
+              <p className="text-sm text-slate-600 max-w-md mx-auto leading-relaxed">
                 Der professionelle Katalog für Antiquitäten, Kunst und Sammlerobjekte mit
                 integrierter <strong>Google Gemini Multimodal AI</strong> für automatische
                 Epochen-, Material- und Werteerkennung.
@@ -175,26 +175,26 @@ function MainApp() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-left pt-2">
-              <div className="p-3.5 bg-stone-50 rounded-2xl border border-stone-200">
-                <Sparkles className="w-5 h-5 text-amber-700 mb-1.5" />
-                <h4 className="text-xs font-bold text-stone-800">1-Klick KI-Scan</h4>
-                <p className="text-[11px] text-stone-500 mt-0.5">
+              <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+                <Sparkles className="w-5 h-5 text-slate-700 mb-1.5" />
+                <h4 className="text-xs font-semibold text-slate-900">1-Klick KI-Scan</h4>
+                <p className="text-[11px] text-slate-500 mt-0.5">
                   Fotos hochladen &amp; Gemini ermittelt automatisch 23 Attribute.
                 </p>
               </div>
 
-              <div className="p-3.5 bg-stone-50 rounded-2xl border border-stone-200">
-                <Landmark className="w-5 h-5 text-amber-700 mb-1.5" />
-                <h4 className="text-xs font-bold text-stone-800">Katalog &amp; Standorte</h4>
-                <p className="text-[11px] text-stone-500 mt-0.5">
+              <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+                <Landmark className="w-5 h-5 text-slate-700 mb-1.5" />
+                <h4 className="text-xs font-semibold text-slate-900">Katalog &amp; Standorte</h4>
+                <p className="text-[11px] text-slate-500 mt-0.5">
                   Hierarchische Standorte, Vitrinen, Epochen und Filter.
                 </p>
               </div>
 
-              <div className="p-3.5 bg-stone-50 rounded-2xl border border-stone-200">
-                <Lock className="w-5 h-5 text-amber-700 mb-1.5" />
-                <h4 className="text-xs font-bold text-stone-800">Sicher &amp; DSGVO</h4>
-                <p className="text-[11px] text-stone-500 mt-0.5">
+              <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+                <Lock className="w-5 h-5 text-slate-700 mb-1.5" />
+                <h4 className="text-xs font-semibold text-slate-900">Sicher &amp; DSGVO</h4>
+                <p className="text-[11px] text-slate-500 mt-0.5">
                   Rollenbasiert mit Authentik OIDC SSO oder lokalem Login.
                 </p>
               </div>
@@ -204,7 +204,7 @@ function MainApp() {
               <button
                 type="button"
                 onClick={() => setIsAuthOpen(true)}
-                className="inline-flex items-center space-x-2 px-8 py-3 bg-amber-800 hover:bg-amber-900 text-white font-bold rounded-2xl shadow-lg shadow-amber-800/20 text-sm transition-all transform active:scale-98"
+                className="inline-flex items-center space-x-2 px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-lg shadow-sm text-sm transition-all transform active:scale-98"
               >
                 <LogIn className="w-4 h-4" />
                 <span>Jetzt anmelden / registrieren</span>
@@ -289,7 +289,7 @@ function MainApp() {
                 ? 'bg-emerald-900 text-white border-emerald-700'
                 : toast.type === 'error'
                 ? 'bg-rose-900 text-white border-rose-700'
-                : 'bg-stone-900 text-white border-stone-700'
+                : 'bg-slate-900 text-white border-slate-700'
             }`}
           >
             {toast.type === 'success' ? (
@@ -297,7 +297,7 @@ function MainApp() {
             ) : toast.type === 'error' ? (
               <AlertCircle className="w-4 h-4 text-rose-300 flex-shrink-0" />
             ) : (
-              <Sparkles className="w-4 h-4 text-amber-300 flex-shrink-0" />
+              <Sparkles className="w-4 h-4 text-slate-300 flex-shrink-0" />
             )}
             <span className="flex-1">{toast.message}</span>
             <button

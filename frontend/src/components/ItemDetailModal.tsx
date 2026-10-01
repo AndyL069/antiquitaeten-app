@@ -235,20 +235,20 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
   const sales = item.sales || [];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-stone-900/60 backdrop-blur-sm animate-fade-in overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in overflow-y-auto">
       <div
-        className="relative w-full max-w-5xl bg-white rounded-2xl shadow-2xl border border-stone-200 overflow-hidden flex flex-col max-h-[94vh] my-auto"
+        className="relative w-full max-w-5xl bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[94vh] my-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="px-6 py-4 bg-stone-900 text-white flex items-center justify-between flex-shrink-0">
+        <div className="px-6 py-4 bg-slate-900 text-white flex items-center justify-between flex-shrink-0">
           <div className="flex items-center space-x-3">
             {item.inventoryNumber && (
-              <span className="px-2.5 py-1 bg-amber-500/20 text-amber-300 font-mono text-xs font-semibold rounded-lg border border-amber-500/30">
+              <span className="px-2.5 py-1 bg-slate-800 text-slate-200 font-mono text-xs font-semibold rounded-lg border border-slate-700">
                 {item.inventoryNumber}
               </span>
             )}
-            <h2 className="text-lg sm:text-xl font-bold tracking-tight truncate max-w-xl">
+            <h2 className="text-lg sm:text-xl font-serif font-bold tracking-tight truncate max-w-xl">
               {item.name}
             </h2>
           </div>
@@ -256,7 +256,7 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
             <button
               type="button"
               onClick={() => onEdit(item)}
-              className="flex items-center space-x-1.5 px-3 py-1.5 bg-amber-700 hover:bg-amber-800 text-white rounded-xl text-xs font-semibold shadow transition-colors"
+              className="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-medium shadow transition-colors"
             >
               <Edit3 className="w-3.5 h-3.5" />
               <span>Bearbeiten</span>
@@ -264,7 +264,7 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="p-1.5 rounded-xl text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+              className="p-1.5 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-colors"
               title="Schließen"
             >
               <X className="w-5 h-5" />
@@ -279,18 +279,18 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
             {/* Gallery Column (7 cols) */}
             <div className="lg:col-span-7 space-y-3">
               {/* Primary View */}
-              <div className="relative aspect-[4/3] bg-stone-100 rounded-2xl overflow-hidden border border-stone-200 flex items-center justify-center shadow-inner group">
+              <div className="relative aspect-[4/3] bg-slate-100 rounded-xl overflow-hidden border border-slate-200 flex items-center justify-center shadow-inner group">
                 {currentPhoto ? (
                   <>
                     <img
                       src={getPhotoUrl(currentPhoto.path)}
                       alt={item.name}
-                      className="w-full h-full object-contain bg-stone-900/5"
+                      className="w-full h-full object-contain bg-slate-900/5"
                     />
                     {/* Primary Badge */}
                     {currentPhoto.isPrimary && (
-                      <div className="absolute top-3 left-3 bg-amber-800 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg shadow flex items-center space-x-1">
-                        <Star className="w-3 h-3 fill-amber-300 text-amber-300" />
+                      <div className="absolute top-3 left-3 bg-slate-900 text-white text-[11px] font-medium px-2.5 py-1 rounded shadow flex items-center space-x-1">
+                        <Star className="w-3 h-3 fill-slate-300 text-slate-300" />
                         <span>Hauptfoto</span>
                       </div>
                     )}
@@ -301,10 +301,10 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                           type="button"
                           onClick={() => handleSetPrimary(currentPhoto.id)}
                           disabled={photoActionLoading === currentPhoto.id}
-                          className="px-2.5 py-1 bg-white/90 hover:bg-white text-stone-800 text-xs font-semibold rounded-lg shadow border border-stone-200 flex items-center space-x-1"
+                          className="px-2.5 py-1 bg-white/90 hover:bg-white text-slate-800 text-xs font-medium rounded shadow border border-slate-200 flex items-center space-x-1"
                           title="Als primäres Foto setzen"
                         >
-                          <Star className="w-3 h-3 text-amber-600" />
+                          <Star className="w-3 h-3 text-slate-500" />
                           <span>Als Hauptfoto</span>
                         </button>
                       )}
@@ -312,7 +312,7 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                         type="button"
                         onClick={() => handleDeletePhoto(currentPhoto.id)}
                         disabled={photoActionLoading === currentPhoto.id}
-                        className="p-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow"
+                        className="p-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg shadow"
                         title="Foto löschen"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -320,8 +320,8 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                     </div>
                   </>
                 ) : (
-                  <div className="text-center p-8 text-stone-400">
-                    <ImageIcon className="w-16 h-16 stroke-1 mx-auto mb-2 text-stone-300" />
+                  <div className="text-center p-8 text-slate-400">
+                    <ImageIcon className="w-16 h-16 stroke-1 mx-auto mb-2 text-slate-300" />
                     <p className="text-sm">Kein Foto für dieses Objekt vorhanden.</p>
                   </div>
                 )}
@@ -336,13 +336,13 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                     onClick={() => setActivePhotoIndex(idx)}
                     className={`relative w-16 h-16 rounded-xl overflow-hidden border-2 flex-shrink-0 transition-all ${
                       idx === activePhotoIndex
-                        ? 'border-amber-700 ring-2 ring-amber-700/30'
-                        : 'border-stone-200 opacity-70 hover:opacity-100'
+                        ? 'border-slate-900 ring-2 ring-slate-900/20'
+                        : 'border-slate-200 opacity-70 hover:opacity-100'
                     }`}
                   >
                     <img src={getPhotoUrl(p.path)} alt="" className="w-full h-full object-cover" />
                     {p.isPrimary && (
-                      <span className="absolute bottom-0 inset-x-0 bg-amber-800 text-[8px] text-white font-bold text-center py-0.5">
+                      <span className="absolute bottom-0 inset-x-0 bg-slate-900 text-[8px] text-white font-medium text-center py-0.5">
                         Haupt
                       </span>
                     )}
@@ -362,11 +362,11 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isUploadingPhoto}
-                  className="w-16 h-16 rounded-xl border-2 border-dashed border-stone-300 hover:border-amber-600 flex flex-col items-center justify-center text-stone-500 hover:text-amber-800 transition-colors flex-shrink-0 bg-stone-50"
+                  className="w-16 h-16 rounded-xl border-2 border-dashed border-slate-300 hover:border-slate-600 flex flex-col items-center justify-center text-slate-500 hover:text-slate-800 transition-colors flex-shrink-0 bg-slate-50"
                   title="Weiteres Foto hinzufügen"
                 >
                   {isUploadingPhoto ? (
-                    <Loader2 className="w-5 h-5 animate-spin text-amber-700" />
+                    <Loader2 className="w-5 h-5 animate-spin text-slate-700" />
                   ) : (
                     <>
                       <Plus className="w-5 h-5 mb-0.5" />
@@ -382,68 +382,68 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
               {/* Badges Bar */}
               <div className="flex flex-wrap gap-2">
                 {item.category && (
-                  <span className="px-3 py-1 bg-stone-100 text-stone-800 text-xs font-semibold rounded-lg border border-stone-200">
+                  <span className="px-3 py-1 bg-slate-100 text-slate-800 text-xs font-medium rounded-lg border border-slate-200">
                     {item.category}
                   </span>
                 )}
                 {item.era && (
-                  <span className="px-3 py-1 bg-amber-50 text-amber-900 text-xs font-semibold rounded-lg border border-amber-200 flex items-center">
-                    <Calendar className="w-3.5 h-3.5 mr-1 text-amber-700" />
+                  <span className="px-3 py-1 bg-slate-100 text-slate-800 text-xs font-medium rounded-lg border border-slate-200 flex items-center">
+                    <Calendar className="w-3.5 h-3.5 mr-1 text-slate-500" />
                     {item.era}
                   </span>
                 )}
                 {item.condition && (
-                  <span className="px-3 py-1 bg-emerald-50 text-emerald-800 text-xs font-semibold rounded-lg border border-emerald-200">
+                  <span className="px-3 py-1 bg-emerald-50 text-emerald-800 text-xs font-medium rounded-lg border border-emerald-200">
                     {item.condition}
                   </span>
                 )}
               </div>
 
               {/* Location Card */}
-              <div className="p-3.5 bg-stone-50 rounded-xl border border-stone-200 flex items-center space-x-3">
-                <div className="p-2 bg-amber-100 text-amber-800 rounded-lg">
+              <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 flex items-center space-x-3">
+                <div className="p-2 bg-slate-200 text-slate-700 rounded-lg">
                   <MapPin className="w-5 h-5" />
                 </div>
                 <div>
-                  <span className="block text-[11px] font-bold text-stone-400 uppercase tracking-wider">
+                  <span className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">
                     Standort
                   </span>
-                  <span className="text-sm font-semibold text-stone-800">
+                  <span className="text-sm font-semibold text-slate-800">
                     {item.location?.name || 'Kein Standort hinterlegt'}
                   </span>
                 </div>
               </div>
 
               {/* Key Specifications Table */}
-              <div className="bg-white rounded-xl border border-stone-200 divide-y divide-stone-100 text-xs">
+              <div className="bg-white rounded-xl border border-slate-200 divide-y divide-slate-100 text-xs">
                 {item.origin && (
                   <div className="flex justify-between py-2 px-3">
-                    <span className="text-stone-500 font-medium">Herkunft:</span>
-                    <span className="font-semibold text-stone-800 text-right">{item.origin}</span>
+                    <span className="text-slate-500 font-medium">Herkunft:</span>
+                    <span className="font-semibold text-slate-800 text-right">{item.origin}</span>
                   </div>
                 )}
                 {item.material && (
                   <div className="flex justify-between py-2 px-3">
-                    <span className="text-stone-500 font-medium">Material:</span>
-                    <span className="font-semibold text-stone-800 text-right">{item.material}</span>
+                    <span className="text-slate-500 font-medium">Material:</span>
+                    <span className="font-semibold text-slate-800 text-right">{item.material}</span>
                   </div>
                 )}
                 {item.dimensions && (
                   <div className="flex justify-between py-2 px-3">
-                    <span className="text-stone-500 font-medium">Abmessungen:</span>
-                    <span className="font-semibold text-stone-800 text-right">{item.dimensions}</span>
+                    <span className="text-slate-500 font-medium">Abmessungen:</span>
+                    <span className="font-semibold text-slate-800 text-right">{item.dimensions}</span>
                   </div>
                 )}
                 {item.weight && (
                   <div className="flex justify-between py-2 px-3">
-                    <span className="text-stone-500 font-medium">Gewicht:</span>
-                    <span className="font-semibold text-stone-800 text-right">{item.weight}</span>
+                    <span className="text-slate-500 font-medium">Gewicht:</span>
+                    <span className="font-semibold text-slate-800 text-right">{item.weight}</span>
                   </div>
                 )}
                 {item.acquisitionDate && (
                   <div className="flex justify-between py-2 px-3">
-                    <span className="text-stone-500 font-medium">Erwerbsdatum:</span>
-                    <span className="font-semibold text-stone-800 text-right">
+                    <span className="text-slate-500 font-medium">Erwerbsdatum:</span>
+                    <span className="font-semibold text-slate-800 text-right">
                       {item.acquisitionDate}
                     </span>
                   </div>
@@ -451,14 +451,14 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
               </div>
 
               {/* Price / Valuation Card */}
-              <div className="p-4 bg-gradient-to-br from-amber-50 to-amber-100/60 rounded-xl border border-amber-200/80 space-y-2">
+              <div className="p-4 bg-slate-900 text-white rounded-xl shadow-sm space-y-1">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-amber-900 uppercase tracking-wider">
+                  <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">
                     Aktueller Schätzwert
                   </span>
-                  <DollarSign className="w-4 h-4 text-amber-700" />
+                  <DollarSign className="w-4 h-4 text-slate-400" />
                 </div>
-                <div className="text-2xl font-bold font-mono text-stone-900">
+                <div className="text-2xl font-bold font-mono text-white">
                   {appraisals.length > 0
                     ? new Intl.NumberFormat('de-DE', {
                         style: 'currency',
@@ -469,7 +469,7 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                     : 'Nicht geschätzt'}
                 </div>
                 {appraisals.length > 0 && appraisals[appraisals.length - 1].note && (
-                  <p className="text-xs text-amber-900/80 italic">
+                  <p className="text-xs text-slate-300 italic">
                     „{appraisals[appraisals.length - 1].note}“
                   </p>
                 )}
@@ -481,10 +481,10 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
           <div className="space-y-4">
             {item.description && (
               <div>
-                <h3 className="text-sm font-bold text-stone-800 uppercase tracking-wider mb-2">
+                <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-2">
                   Beschreibung
                 </h3>
-                <div className="p-4 bg-stone-50 rounded-xl border border-stone-200 text-stone-700 text-sm leading-relaxed whitespace-pre-line">
+                <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 text-slate-700 text-sm leading-relaxed whitespace-pre-line">
                   {item.description}
                 </div>
               </div>
@@ -492,11 +492,11 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
 
             {item.context && (
               <div>
-                <h3 className="text-sm font-bold text-amber-900 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                  <Info className="w-4 h-4 text-amber-700" />
+                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                  <Info className="w-4 h-4 text-slate-600" />
                   <span>Historischer Kontext &amp; Epocheneinordnung</span>
                 </h3>
-                <div className="p-4 bg-amber-50/70 border border-amber-200/70 rounded-xl text-stone-800 text-sm leading-relaxed italic border-l-4 border-l-amber-700">
+                <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 text-sm leading-relaxed italic border-l-4 border-l-slate-700">
                   {item.context}
                 </div>
               </div>
@@ -505,9 +505,9 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
 
           {/* Book Section (Conditional) */}
           {hasBookFields && (
-            <div className="p-5 bg-stone-50 rounded-2xl border border-stone-200 space-y-3">
-              <div className="flex items-center space-x-2 text-stone-800">
-                <BookOpen className="w-5 h-5 text-amber-800" />
+            <div className="p-5 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+              <div className="flex items-center space-x-2 text-slate-800">
+                <BookOpen className="w-5 h-5 text-slate-700" />
                 <h3 className="text-sm font-bold uppercase tracking-wider">
                   Buch- &amp; Druckwerk-Metadaten
                 </h3>
@@ -515,42 +515,42 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
                 {item.author && (
                   <div>
-                    <span className="text-stone-400 block uppercase font-bold text-[10px]">
+                    <span className="text-slate-400 block uppercase font-bold text-[10px]">
                       Autor
                     </span>
-                    <span className="font-semibold text-stone-800">{item.author}</span>
+                    <span className="font-semibold text-slate-800">{item.author}</span>
                   </div>
                 )}
                 {item.publisher && (
                   <div>
-                    <span className="text-stone-400 block uppercase font-bold text-[10px]">
+                    <span className="text-slate-400 block uppercase font-bold text-[10px]">
                       Verlag / Druckerei
                     </span>
-                    <span className="font-semibold text-stone-800">{item.publisher}</span>
+                    <span className="font-semibold text-slate-800">{item.publisher}</span>
                   </div>
                 )}
                 {item.publicationYear && (
                   <div>
-                    <span className="text-stone-400 block uppercase font-bold text-[10px]">
+                    <span className="text-slate-400 block uppercase font-bold text-[10px]">
                       Erscheinungsjahr
                     </span>
-                    <span className="font-semibold text-stone-800">{item.publicationYear}</span>
+                    <span className="font-semibold text-slate-800">{item.publicationYear}</span>
                   </div>
                 )}
                 {item.edition && (
                   <div>
-                    <span className="text-stone-400 block uppercase font-bold text-[10px]">
+                    <span className="text-slate-400 block uppercase font-bold text-[10px]">
                       Auflage
                     </span>
-                    <span className="font-semibold text-stone-800">{item.edition}</span>
+                    <span className="font-semibold text-slate-800">{item.edition}</span>
                   </div>
                 )}
                 {item.language && (
                   <div>
-                    <span className="text-stone-400 block uppercase font-bold text-[10px]">
+                    <span className="text-slate-400 block uppercase font-bold text-[10px]">
                       Sprache
                     </span>
-                    <span className="font-semibold text-stone-800">{item.language}</span>
+                    <span className="font-semibold text-slate-800">{item.language}</span>
                   </div>
                 )}
               </div>
@@ -558,36 +558,36 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
           )}
 
           {/* eBay & Valuation Section */}
-          <div className="p-5 bg-white rounded-2xl border border-stone-200 space-y-4 shadow-sm">
-            <h3 className="text-sm font-bold text-stone-800 uppercase tracking-wider flex items-center justify-between">
+          <div className="p-5 bg-white rounded-xl border border-slate-200 space-y-4 shadow-sm">
+            <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center justify-between">
               <span>eBay &amp; Marktplatz-Daten</span>
-              <Tag className="w-4 h-4 text-stone-400" />
+              <Tag className="w-4 h-4 text-slate-400" />
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
               <div className="sm:col-span-2">
-                <span className="text-stone-400 block uppercase font-bold text-[10px]">
+                <span className="text-slate-400 block uppercase font-bold text-[10px]">
                   eBay Angebotstitel
                 </span>
-                <span className="font-semibold text-stone-800">
+                <span className="font-semibold text-slate-800">
                   {item.ebayTitle || '—'}
                 </span>
               </div>
               <div>
-                <span className="text-stone-400 block uppercase font-bold text-[10px]">
+                <span className="text-slate-400 block uppercase font-bold text-[10px]">
                   Startpreis
                 </span>
-                <span className="font-semibold text-stone-800 font-mono">
+                <span className="font-semibold text-slate-800 font-mono">
                   {item.startPrice !== null && item.startPrice !== undefined
                     ? `${item.startPrice} €`
                     : '—'}
                 </span>
               </div>
               <div>
-                <span className="text-stone-400 block uppercase font-bold text-[10px]">
+                <span className="text-slate-400 block uppercase font-bold text-[10px]">
                   Sofort-Kaufpreis
                 </span>
-                <span className="font-semibold text-stone-800 font-mono">
+                <span className="font-semibold text-slate-800 font-mono">
                   {item.buyItNowPrice !== null && item.buyItNowPrice !== undefined
                     ? `${item.buyItNowPrice} €`
                     : '—'}
@@ -596,11 +596,11 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
             </div>
 
             {(item.ebayCondition || item.ebayConditionNote) && (
-              <div className="pt-2 border-t border-stone-100 text-xs">
-                <span className="text-stone-400 uppercase font-bold text-[10px] mr-2">
+              <div className="pt-2 border-t border-slate-100 text-xs">
+                <span className="text-slate-400 uppercase font-bold text-[10px] mr-2">
                   eBay Zustand:
                 </span>
-                <span className="font-medium text-stone-800">
+                <span className="font-medium text-slate-800">
                   {item.ebayCondition}{' '}
                   {item.ebayConditionNote ? `(${item.ebayConditionNote})` : ''}
                 </span>
@@ -612,15 +612,15 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <DollarSign className="w-4 h-4 text-amber-700" />
-                <h3 className="text-sm font-bold text-stone-900 uppercase tracking-wider">
+                <DollarSign className="w-4 h-4 text-slate-700" />
+                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
                   Wertschätzungen ({appraisals.length})
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setShowAppraisalForm(!showAppraisalForm)}
-                className="flex items-center space-x-1 px-3 py-1 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 rounded-lg text-xs font-semibold transition-colors"
+                className="flex items-center space-x-1 px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 rounded-lg text-xs font-medium transition-colors"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Schätzung erfassen</span>
@@ -631,14 +631,14 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
             {showAppraisalForm && (
               <form
                 onSubmit={handleAddAppraisal}
-                className="p-4 bg-stone-50 rounded-xl border border-stone-200 space-y-3 animate-fade-in"
+                className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3 animate-fade-in"
               >
-                <h4 className="text-xs font-bold text-stone-700 uppercase tracking-wider">
+                <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
                   Neue Wertschätzung hinzufügen
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                   <div>
-                    <label className="block text-[11px] font-semibold text-stone-600 mb-1">
+                    <label className="block text-[11px] font-semibold text-slate-600 mb-1">
                       Wert *
                     </label>
                     <input
@@ -648,17 +648,17 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                       value={appraisalValue}
                       onChange={(e) => setAppraisalValue(e.target.value)}
                       placeholder="1200.00"
-                      className="w-full px-3 py-1.5 border border-stone-300 rounded-lg text-xs"
+                      className="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-semibold text-stone-600 mb-1">
+                    <label className="block text-[11px] font-semibold text-slate-600 mb-1">
                       Währung
                     </label>
                     <select
                       value={appraisalCurrency}
                       onChange={(e) => setAppraisalCurrency(e.target.value)}
-                      className="w-full px-3 py-1.5 border border-stone-300 rounded-lg text-xs"
+                      className="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs"
                     >
                       {CURRENCIES.map((c) => (
                         <option key={c} value={c}>
@@ -668,7 +668,7 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                     </select>
                   </div>
                   <div>
-                    <label className="block text-[11px] font-semibold text-stone-600 mb-1">
+                    <label className="block text-[11px] font-semibold text-slate-600 mb-1">
                       Gutachter / Quelle
                     </label>
                     <input
@@ -676,23 +676,23 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                       value={appraisalAppraiser}
                       onChange={(e) => setAppraisalAppraiser(e.target.value)}
                       placeholder="z.B. Dorotheum"
-                      className="w-full px-3 py-1.5 border border-stone-300 rounded-lg text-xs"
+                      className="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-semibold text-stone-600 mb-1">
+                    <label className="block text-[11px] font-semibold text-slate-600 mb-1">
                       Datum
                     </label>
                     <input
                       type="date"
                       value={appraisalDate}
                       onChange={(e) => setAppraisalDate(e.target.value)}
-                      className="w-full px-3 py-1.5 border border-stone-300 rounded-lg text-xs"
+                      className="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-[11px] font-semibold text-stone-600 mb-1">
+                  <label className="block text-[11px] font-semibold text-slate-600 mb-1">
                     Notiz / Begründung
                   </label>
                   <input
@@ -700,21 +700,21 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                     value={appraisalNote}
                     onChange={(e) => setAppraisalNote(e.target.value)}
                     placeholder="z.B. Auktionskatalog Referenzlos #104"
-                    className="w-full px-3 py-1.5 border border-stone-300 rounded-lg text-xs"
+                    className="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs"
                   />
                 </div>
                 <div className="flex justify-end space-x-2 pt-1">
                   <button
                     type="button"
                     onClick={() => setShowAppraisalForm(false)}
-                    className="px-3 py-1 text-xs text-stone-600 hover:text-stone-800"
+                    className="px-3 py-1 text-xs text-slate-600 hover:text-slate-800"
                   >
                     Abbrechen
                   </button>
                   <button
                     type="submit"
                     disabled={isSubmittingAppraisal}
-                    className="px-4 py-1.5 bg-amber-800 text-white rounded-lg text-xs font-bold hover:bg-amber-900 disabled:bg-stone-300"
+                    className="px-4 py-1.5 bg-slate-900 text-white rounded-lg text-xs font-medium hover:bg-slate-800 disabled:bg-slate-300"
                   >
                     {isSubmittingAppraisal ? 'Wird gespeichert...' : 'Schätzung speichern'}
                   </button>
@@ -724,30 +724,30 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
 
             {/* Appraisal List */}
             {appraisals.length > 0 ? (
-              <div className="divide-y divide-stone-100 border border-stone-200 rounded-xl overflow-hidden bg-white">
+              <div className="divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden bg-white">
                 {appraisals.map((a) => (
-                  <div key={a.id} className="p-3 flex items-center justify-between text-xs hover:bg-stone-50">
+                  <div key={a.id} className="p-3 flex items-center justify-between text-xs hover:bg-slate-50">
                     <div>
                       <div className="flex items-center space-x-2">
-                        <span className="font-bold font-mono text-stone-900 text-sm">
+                        <span className="font-bold font-mono text-slate-900 text-sm">
                           {new Intl.NumberFormat('de-DE', {
                             style: 'currency',
                             currency: a.currency || 'EUR',
                           }).format(a.value)}
                         </span>
                         {a.appraiser && (
-                          <span className="text-stone-500 font-medium">({a.appraiser})</span>
+                          <span className="text-slate-500 font-medium">({a.appraiser})</span>
                         )}
                         {a.appraisalDate && (
-                          <span className="text-stone-400">am {a.appraisalDate}</span>
+                          <span className="text-slate-400">am {a.appraisalDate}</span>
                         )}
                       </div>
-                      {a.note && <p className="text-stone-600 text-xs mt-0.5">{a.note}</p>}
+                      {a.note && <p className="text-slate-600 text-xs mt-0.5">{a.note}</p>}
                     </div>
                     <button
                       type="button"
                       onClick={() => handleDeleteAppraisal(a.id)}
-                      className="p-1 text-stone-400 hover:text-red-600 rounded transition-colors"
+                      className="p-1 text-slate-400 hover:text-rose-600 rounded transition-colors"
                       title="Schätzung löschen"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -756,7 +756,7 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-stone-400 italic">Noch keine Wertschätzungen erfasst.</p>
+              <p className="text-xs text-slate-400 italic">Noch keine Wertschätzungen erfasst.</p>
             )}
           </div>
 
@@ -765,14 +765,14 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <TrendingUp className="w-4 h-4 text-emerald-700" />
-                <h3 className="text-sm font-bold text-stone-900 uppercase tracking-wider">
+                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
                   Verkäufe ({sales.length})
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setShowSaleForm(!showSaleForm)}
-                className="flex items-center space-x-1 px-3 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200 rounded-lg text-xs font-semibold transition-colors"
+                className="flex items-center space-x-1 px-3 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200 rounded-lg text-xs font-medium transition-colors"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Verkauf erfassen</span>
@@ -783,14 +783,14 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
             {showSaleForm && (
               <form
                 onSubmit={handleAddSale}
-                className="p-4 bg-stone-50 rounded-xl border border-stone-200 space-y-3 animate-fade-in"
+                className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3 animate-fade-in"
               >
-                <h4 className="text-xs font-bold text-stone-700 uppercase tracking-wider">
+                <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
                   Verkauf dokumentieren
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                   <div>
-                    <label className="block text-[11px] font-semibold text-stone-600 mb-1">
+                    <label className="block text-[11px] font-semibold text-slate-600 mb-1">
                       Verkaufspreis *
                     </label>
                     <input
@@ -800,17 +800,17 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                       value={saleAmount}
                       onChange={(e) => setSaleAmount(e.target.value)}
                       placeholder="1500.00"
-                      className="w-full px-3 py-1.5 border border-stone-300 rounded-lg text-xs"
+                      className="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-semibold text-stone-600 mb-1">
+                    <label className="block text-[11px] font-semibold text-slate-600 mb-1">
                       Währung
                     </label>
                     <select
                       value={saleCurrency}
                       onChange={(e) => setSaleCurrency(e.target.value)}
-                      className="w-full px-3 py-1.5 border border-stone-300 rounded-lg text-xs"
+                      className="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs"
                     >
                       {CURRENCIES.map((c) => (
                         <option key={c} value={c}>
@@ -820,7 +820,7 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                     </select>
                   </div>
                   <div>
-                    <label className="block text-[11px] font-semibold text-stone-600 mb-1">
+                    <label className="block text-[11px] font-semibold text-slate-600 mb-1">
                       Plattform / Käufer
                     </label>
                     <input
@@ -828,23 +828,23 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                       value={salePlatform}
                       onChange={(e) => setSalePlatform(e.target.value)}
                       placeholder="z.B. eBay / Messe"
-                      className="w-full px-3 py-1.5 border border-stone-300 rounded-lg text-xs"
+                      className="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-semibold text-stone-600 mb-1">
+                    <label className="block text-[11px] font-semibold text-slate-600 mb-1">
                       Verkaufsdatum
                     </label>
                     <input
                       type="date"
                       value={saleDate}
                       onChange={(e) => setSaleDate(e.target.value)}
-                      className="w-full px-3 py-1.5 border border-stone-300 rounded-lg text-xs"
+                      className="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-[11px] font-semibold text-stone-600 mb-1">
+                  <label className="block text-[11px] font-semibold text-slate-600 mb-1">
                     Notiz
                   </label>
                   <input
@@ -852,21 +852,21 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                     value={saleNote}
                     onChange={(e) => setSaleNote(e.target.value)}
                     placeholder="z.B. Inklusive Versand und Versicherung"
-                    className="w-full px-3 py-1.5 border border-stone-300 rounded-lg text-xs"
+                    className="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs"
                   />
                 </div>
                 <div className="flex justify-end space-x-2 pt-1">
                   <button
                     type="button"
                     onClick={() => setShowSaleForm(false)}
-                    className="px-3 py-1 text-xs text-stone-600 hover:text-stone-800"
+                    className="px-3 py-1 text-xs text-slate-600 hover:text-slate-800"
                   >
                     Abbrechen
                   </button>
                   <button
                     type="submit"
                     disabled={isSubmittingSale}
-                    className="px-4 py-1.5 bg-emerald-700 text-white rounded-lg text-xs font-bold hover:bg-emerald-800 disabled:bg-stone-300"
+                    className="px-4 py-1.5 bg-emerald-700 text-white rounded-lg text-xs font-medium hover:bg-emerald-800 disabled:bg-slate-300"
                   >
                     {isSubmittingSale ? 'Wird gespeichert...' : 'Verkauf speichern'}
                   </button>
@@ -876,9 +876,9 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
 
             {/* Sale List */}
             {sales.length > 0 ? (
-              <div className="divide-y divide-stone-100 border border-stone-200 rounded-xl overflow-hidden bg-white">
+              <div className="divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden bg-white">
                 {sales.map((s) => (
-                  <div key={s.id} className="p-3 flex items-center justify-between text-xs hover:bg-stone-50">
+                  <div key={s.id} className="p-3 flex items-center justify-between text-xs hover:bg-slate-50">
                     <div>
                       <div className="flex items-center space-x-2">
                         <span className="font-bold font-mono text-emerald-800 text-sm">
@@ -887,15 +887,15 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                             currency: s.currency || 'EUR',
                           }).format(s.amount)}
                         </span>
-                        <span className="text-stone-600 font-medium">über {s.platform}</span>
-                        {s.soldAt && <span className="text-stone-400">am {s.soldAt}</span>}
+                        <span className="text-slate-600 font-medium">über {s.platform}</span>
+                        {s.soldAt && <span className="text-slate-400">am {s.soldAt}</span>}
                       </div>
-                      {s.note && <p className="text-stone-500 text-xs mt-0.5">{s.note}</p>}
+                      {s.note && <p className="text-slate-500 text-xs mt-0.5">{s.note}</p>}
                     </div>
                     <button
                       type="button"
                       onClick={() => handleDeleteSale(s.id)}
-                      className="p-1 text-stone-400 hover:text-red-600 rounded transition-colors"
+                      className="p-1 text-slate-400 hover:text-rose-600 rounded transition-colors"
                       title="Verkauf löschen"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -904,17 +904,17 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-stone-400 italic">Noch keine Verkäufe registriert.</p>
+              <p className="text-xs text-slate-400 italic">Noch keine Verkäufe registriert.</p>
             )}
           </div>
         </div>
 
         {/* Modal Footer */}
-        <div className="px-6 py-4 bg-stone-50 border-t border-stone-200 flex items-center justify-between flex-shrink-0">
+        <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between flex-shrink-0">
           <button
             type="button"
             onClick={() => setConfirmDeleteModal(true)}
-            className="flex items-center space-x-1.5 px-3.5 py-2 text-red-600 hover:bg-red-50 rounded-xl text-xs font-semibold transition-colors"
+            className="flex items-center space-x-1.5 px-3.5 py-2 text-rose-600 hover:bg-rose-50 rounded-lg text-xs font-medium transition-colors"
           >
             <Trash2 className="w-4 h-4" />
             <span>Objekt löschen</span>
@@ -924,7 +924,7 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2 bg-stone-200 hover:bg-stone-300 text-stone-800 text-xs font-bold rounded-xl transition-colors"
+              className="px-5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-medium rounded-lg transition-colors"
             >
               Schließen
             </button>
@@ -934,14 +934,14 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
 
       {/* Confirmation Sub-Modal for Deleting Item */}
       {confirmDeleteModal && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-stone-900/70 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl border border-stone-200 text-center space-y-4">
-            <div className="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto">
+        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-xl p-6 max-w-sm w-full shadow-2xl border border-slate-200 text-center space-y-4">
+            <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto">
               <AlertTriangle className="w-6 h-6" />
             </div>
             <div>
-              <h4 className="text-lg font-bold text-stone-900">Objekt wirklich löschen?</h4>
-              <p className="text-xs text-stone-500 mt-1">
+              <h4 className="text-lg font-bold text-slate-900">Objekt wirklich löschen?</h4>
+              <p className="text-xs text-slate-500 mt-1">
                 Das Objekt „{item.name}“ und alle zugehörigen Fotos, Schätzungen und Verkäufe werden
                 unwiderruflich entfernt.
               </p>
@@ -951,7 +951,7 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                 type="button"
                 onClick={() => setConfirmDeleteModal(false)}
                 disabled={isDeletingItem}
-                className="px-4 py-2 bg-stone-100 text-stone-700 text-xs font-semibold rounded-xl hover:bg-stone-200"
+                className="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-medium rounded-lg hover:bg-slate-200"
               >
                 Abbrechen
               </button>
@@ -959,7 +959,7 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                 type="button"
                 onClick={handleConfirmDeleteItem}
                 disabled={isDeletingItem}
-                className="px-4 py-2 bg-red-600 text-white text-xs font-bold rounded-xl hover:bg-red-700 flex items-center space-x-1"
+                className="px-4 py-2 bg-rose-600 text-white text-xs font-medium rounded-lg hover:bg-rose-700 flex items-center space-x-1"
               >
                 {isDeletingItem ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
                 <span>Endgültig löschen</span>

@@ -401,22 +401,22 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-stone-900/60 backdrop-blur-sm animate-fade-in overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in overflow-y-auto">
       <div
-        className="relative w-full max-w-4xl bg-white rounded-2xl shadow-2xl border border-stone-200 overflow-hidden flex flex-col max-h-[92vh] my-auto"
+        className="relative w-full max-w-4xl bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh] my-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="px-6 py-4 bg-gradient-to-r from-amber-800 to-amber-950 text-white flex items-center justify-between flex-shrink-0">
+        <div className="px-6 py-4 bg-slate-900 text-white flex items-center justify-between flex-shrink-0">
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-white/10 rounded-xl">
-              <Sparkles className="w-5 h-5 text-amber-200" />
+            <div className="p-2 bg-slate-800 rounded-lg text-slate-200">
+              <Sparkles className="w-5 h-5 text-slate-300" />
             </div>
             <div>
-              <h2 className="text-xl font-bold tracking-tight">
+              <h2 className="text-xl font-serif font-bold tracking-tight">
                 {isEditMode ? 'Objekt bearbeiten' : 'Neues Antiquitäten-Objekt anlegen'}
               </h2>
-              <p className="text-xs text-amber-200/80">
+              <p className="text-xs text-slate-400">
                 {isEditMode ? persistedItem?.name || name : 'Fotos hochladen, mit KI scannen oder manuell erfassen'}
               </p>
             </div>
@@ -432,28 +432,28 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
         </div>
 
         {/* AI & Photo Banner Section */}
-        <div className="p-6 bg-stone-50 border-b border-stone-200 space-y-4 flex-shrink-0">
+        <div className="p-6 bg-slate-50 border-b border-slate-200 space-y-4 flex-shrink-0">
           {/* Photo Dropzone */}
           <div
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}
             onDragOver={handleDrag}
             onDrop={handleDrop}
-            className={`border-2 border-dashed rounded-2xl p-4 text-center transition-colors flex flex-col sm:flex-row items-center justify-between gap-4 ${
+            className={`border-2 border-dashed rounded-xl p-4 text-center transition-colors flex flex-col sm:flex-row items-center justify-between gap-4 ${
               dragActive
-                ? 'border-amber-600 bg-amber-50/70'
-                : 'border-stone-300 hover:border-amber-500 bg-white'
+                ? 'border-slate-900 bg-slate-100'
+                : 'border-slate-300 hover:border-slate-500 bg-white'
             }`}
           >
             <div className="flex items-center space-x-3 text-left">
-              <div className="p-3 bg-amber-100/60 rounded-xl text-amber-800">
+              <div className="p-3 bg-slate-100 rounded-lg text-slate-700">
                 <Upload className="w-6 h-6" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-stone-800">
+                <p className="text-sm font-semibold text-slate-800">
                   Fotos hochladen &amp; per Drag-and-Drop ablegen
                 </p>
-                <p className="text-xs text-stone-500">
+                <p className="text-xs text-slate-500">
                   JPG, PNG, WebP bis 10MB (mehrere Fotos möglich)
                 </p>
               </div>
@@ -471,7 +471,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold rounded-xl transition-colors"
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg transition-colors"
               >
                 Fotos auswählen
               </button>
@@ -481,7 +481,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                 type="button"
                 onClick={handleGeminiAnalysis}
                 disabled={newFiles.length === 0 || isAnalyzing}
-                className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 disabled:from-stone-300 disabled:to-stone-400 text-white text-xs font-bold rounded-xl shadow-md transition-all duration-150 transform active:scale-98"
+                className="flex items-center space-x-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-300 text-white text-xs font-medium rounded-lg shadow-sm transition-all duration-150 transform active:scale-98"
                 title={
                   newFiles.length === 0
                     ? 'Wählen Sie Fotos aus, um die KI-Analyse zu starten'
@@ -490,12 +490,12 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
               >
                 {isAnalyzing ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin text-amber-200" />
+                    <Loader2 className="w-4 h-4 animate-spin text-slate-300" />
                     <span>Gemini analysiert...</span>
                   </>
                 ) : (
                   <>
-                    <Sparkles className="w-4 h-4 text-amber-200" />
+                    <Sparkles className="w-4 h-4 text-slate-300" />
                     <span>Mit KI analysieren (Gemini)</span>
                   </>
                 )}
@@ -507,18 +507,18 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
           {newFilePreviews.length > 0 && (
             <div className="flex items-center gap-3 overflow-x-auto py-2">
               {newFilePreviews.map((url, idx) => (
-                <div key={idx} className="relative group w-20 h-20 rounded-xl overflow-hidden border border-stone-200 shadow-sm flex-shrink-0 bg-stone-100">
+                <div key={idx} className="relative group w-20 h-20 rounded-lg overflow-hidden border border-slate-200 shadow-sm flex-shrink-0 bg-slate-100">
                   <img src={url} alt={`Upload ${idx + 1}`} className="w-full h-full object-cover" />
                   <button
                     type="button"
                     onClick={() => removeNewFile(idx)}
-                    className="absolute top-1 right-1 p-1 bg-red-600 text-white rounded-md opacity-90 hover:opacity-100 transition-opacity"
+                    className="absolute top-1 right-1 p-1 bg-rose-600 text-white rounded-md opacity-90 hover:opacity-100 transition-opacity"
                     title="Foto entfernen"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                   {idx === 0 && !isEditMode && (
-                    <span className="absolute bottom-0 inset-x-0 bg-amber-800/80 backdrop-blur-xs text-[9px] text-white font-semibold text-center py-0.5">
+                    <span className="absolute bottom-0 inset-x-0 bg-slate-900/90 text-[9px] text-white font-medium text-center py-0.5">
                       Hauptfoto
                     </span>
                   )}
@@ -529,8 +529,8 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
 
           {/* Existing Photos in Edit Mode */}
           {isEditMode && persistedItem?.photos && persistedItem.photos.length > 0 && (
-            <div className="text-xs text-stone-500">
-              <span className="font-semibold text-stone-700">Bereits gespeicherte Fotos:</span>{' '}
+            <div className="text-xs text-slate-500">
+              <span className="font-semibold text-slate-700">Bereits gespeicherte Fotos:</span>{' '}
               {persistedItem.photos.length} Fotos (weitere können über den Detail-Dialog verwaltet werden)
             </div>
           )}
@@ -553,14 +553,14 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex border-b border-stone-200 bg-white px-6 flex-shrink-0">
+        <div className="flex border-b border-slate-200 bg-white px-6 flex-shrink-0">
           <button
             type="button"
             onClick={() => setActiveTab('basic')}
-            className={`py-3 px-4 text-xs font-bold uppercase tracking-wider border-b-2 transition-all flex items-center space-x-2 ${
+            className={`py-3 px-4 text-xs font-semibold uppercase tracking-wider border-b-2 transition-all flex items-center space-x-2 ${
               activeTab === 'basic'
-                ? 'border-amber-800 text-amber-900 bg-amber-50/50'
-                : 'border-transparent text-stone-500 hover:text-stone-800'
+                ? 'border-slate-900 text-slate-900 bg-slate-50'
+                : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
             <Layers className="w-4 h-4" />
@@ -570,10 +570,10 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
           <button
             type="button"
             onClick={() => setActiveTab('text')}
-            className={`py-3 px-4 text-xs font-bold uppercase tracking-wider border-b-2 transition-all flex items-center space-x-2 ${
+            className={`py-3 px-4 text-xs font-semibold uppercase tracking-wider border-b-2 transition-all flex items-center space-x-2 ${
               activeTab === 'text'
-                ? 'border-amber-800 text-amber-900 bg-amber-50/50'
-                : 'border-transparent text-stone-500 hover:text-stone-800'
+                ? 'border-slate-900 text-slate-900 bg-slate-50'
+                : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
             <FileText className="w-4 h-4" />
@@ -583,26 +583,26 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
           <button
             type="button"
             onClick={() => setActiveTab('book')}
-            className={`py-3 px-4 text-xs font-bold uppercase tracking-wider border-b-2 transition-all flex items-center space-x-2 ${
+            className={`py-3 px-4 text-xs font-semibold uppercase tracking-wider border-b-2 transition-all flex items-center space-x-2 ${
               activeTab === 'book'
-                ? 'border-amber-800 text-amber-900 bg-amber-50/50'
-                : 'border-transparent text-stone-500 hover:text-stone-800'
+                ? 'border-slate-900 text-slate-900 bg-slate-50'
+                : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
             <BookOpen className="w-4 h-4" />
             <span>Buchdaten</span>
             {category === 'Buch' && (
-              <span className="w-2 h-2 rounded-full bg-amber-600 inline-block" />
+              <span className="w-2 h-2 rounded-full bg-slate-700 inline-block" />
             )}
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab('ebay')}
-            className={`py-3 px-4 text-xs font-bold uppercase tracking-wider border-b-2 transition-all flex items-center space-x-2 ${
+            className={`py-3 px-4 text-xs font-semibold uppercase tracking-wider border-b-2 transition-all flex items-center space-x-2 ${
               activeTab === 'ebay'
-                ? 'border-amber-800 text-amber-900 bg-amber-50/50'
-                : 'border-transparent text-stone-500 hover:text-stone-800'
+                ? 'border-slate-900 text-slate-900 bg-slate-50'
+                : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
             <DollarSign className="w-4 h-4" />
@@ -617,7 +617,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
             <div className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                     Objektname <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -626,12 +626,12 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="z.B. Biedermeier Schreibsekretär Kirschbaum"
-                    className="w-full px-3.5 py-2.5 border border-stone-300 rounded-xl text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-700/30 focus:border-amber-700"
+                    className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-1 focus:ring-slate-500 focus:border-slate-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                     Inventarnummer
                   </label>
                   <input
@@ -639,20 +639,20 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                     value={inventoryNumber}
                     onChange={(e) => setInventoryNumber(e.target.value)}
                     placeholder="Auto (z.B. INV-0042)"
-                    className="w-full px-3.5 py-2.5 border border-stone-300 rounded-xl text-stone-900 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-amber-700/30 focus:border-amber-700"
+                    className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-slate-900 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-slate-500 focus:border-slate-500"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                     Kategorie
                   </label>
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="w-full px-3 py-2.5 border border-stone-300 rounded-xl text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-700/30 focus:border-amber-700"
+                    className="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-1 focus:ring-slate-500 focus:border-slate-500"
                   >
                     {CATEGORIES.map((cat) => (
                       <option key={cat} value={cat}>
@@ -663,13 +663,13 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                     Epoche
                   </label>
                   <select
                     value={era}
                     onChange={(e) => setEra(e.target.value)}
-                    className="w-full px-3 py-2.5 border border-stone-300 rounded-xl text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-700/30 focus:border-amber-700"
+                    className="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-1 focus:ring-slate-500 focus:border-slate-500"
                   >
                     {ERAS.map((e) => (
                       <option key={e} value={e}>
@@ -680,13 +680,13 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                     Zustand
                   </label>
                   <select
                     value={condition}
                     onChange={(e) => setCondition(e.target.value)}
-                    className="w-full px-3 py-2.5 border border-stone-300 rounded-xl text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-700/30 focus:border-amber-700"
+                    className="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-1 focus:ring-slate-500 focus:border-slate-500"
                   >
                     {CONDITIONS.map((cond) => (
                       <option key={cond} value={cond}>
@@ -699,7 +699,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                     Material
                   </label>
                   <input
@@ -707,12 +707,12 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                     value={material}
                     onChange={(e) => setMaterial(e.target.value)}
                     placeholder="z.B. Kirschbaum massiv, Messing"
-                    className="w-full px-3.5 py-2.5 border border-stone-300 rounded-xl text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-700/30 focus:border-amber-700"
+                    className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-1 focus:ring-slate-500 focus:border-slate-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                     Herkunft / Manufaktur
                   </label>
                   <input
@@ -720,18 +720,18 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                     value={origin}
                     onChange={(e) => setOrigin(e.target.value)}
                     placeholder="z.B. Süddeutschland / Meissen"
-                    className="w-full px-3.5 py-2.5 border border-stone-300 rounded-xl text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-700/30 focus:border-amber-700"
+                    className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-1 focus:ring-slate-500 focus:border-slate-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                     Standort / Lagerort
                   </label>
                   <select
                     value={locationId}
                     onChange={(e) => setLocationId(e.target.value)}
-                    className="w-full px-3 py-2.5 border border-stone-300 rounded-xl text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-700/30 focus:border-amber-700"
+                    className="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-1 focus:ring-slate-500 focus:border-slate-500"
                   >
                     <option value="">Kein Standort zugewiesen</option>
                     {flattenedLocations.map((loc) => (
@@ -745,7 +745,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                     Abmessungen
                   </label>
                   <input
@@ -753,12 +753,12 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                     value={dimensions}
                     onChange={(e) => setDimensions(e.target.value)}
                     placeholder="z.B. 120 x 85 x 55 cm"
-                    className="w-full px-3.5 py-2.5 border border-stone-300 rounded-xl text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-700/30 focus:border-amber-700"
+                    className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-1 focus:ring-slate-500 focus:border-slate-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                     Gewicht
                   </label>
                   <input
@@ -766,7 +766,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                     value={weight}
                     onChange={(e) => setWeight(e.target.value)}
                     placeholder="z.B. ca. 45 kg"
-                    className="w-full px-3.5 py-2.5 border border-stone-300 rounded-xl text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-700/30 focus:border-amber-700"
+                    className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-1 focus:ring-slate-500 focus:border-slate-500"
                   />
                 </div>
               </div>
@@ -777,7 +777,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
           {activeTab === 'text' && (
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                   Beschreibung
                 </label>
                 <textarea
@@ -785,14 +785,14 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Detaillierte Beschreibung des Objekts, Besonderheiten, Erhaltungszustand..."
-                  className="w-full px-3.5 py-2.5 border border-stone-300 rounded-xl text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-700/30 focus:border-amber-700"
+                  className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-1 focus:ring-slate-500 focus:border-slate-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1 flex items-center justify-between">
+                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1 flex items-center justify-between">
                   <span>Historischer Kontext</span>
-                  <span className="text-[11px] font-normal text-stone-400">
+                  <span className="text-[11px] font-normal text-slate-400">
                     Epoche, Stilgeschichte, Verwendung
                   </span>
                 </label>
@@ -801,7 +801,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                   value={context}
                   onChange={(e) => setContext(e.target.value)}
                   placeholder="Kulturhistorische Einordnung, historische Verwendung und stilistische Merkmale..."
-                  className="w-full px-3.5 py-2.5 border border-stone-300 rounded-xl text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-700/30 focus:border-amber-700"
+                  className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-1 focus:ring-slate-500 focus:border-slate-500"
                 />
               </div>
             </div>
@@ -810,13 +810,13 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
           {/* TAB 3: Buchdaten */}
           {activeTab === 'book' && (
             <div className="space-y-4">
-              <div className="p-3 bg-amber-50 rounded-xl border border-amber-200/60 text-xs text-amber-900 mb-2">
+              <div className="p-3 bg-slate-100 rounded-lg border border-slate-200 text-xs text-slate-700 mb-2">
                 Spezifische Attribute für antike Bücher, Manuskripte, Drucke und Erstausgaben.
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                     Autor / Verfasser
                   </label>
                   <input
@@ -824,12 +824,12 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                     value={author}
                     onChange={(e) => setAuthor(e.target.value)}
                     placeholder="z.B. Johann Wolfgang von Goethe"
-                    className="w-full px-3.5 py-2.5 border border-stone-300 rounded-xl text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-700/30 focus:border-amber-700"
+                    className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-1 focus:ring-slate-500 focus:border-slate-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                     Verlag / Druckerei
                   </label>
                   <input
@@ -837,14 +837,14 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                     value={publisher}
                     onChange={(e) => setPublisher(e.target.value)}
                     placeholder="z.B. Cotta'sche Verlagsbuchhandlung"
-                    className="w-full px-3.5 py-2.5 border border-stone-300 rounded-xl text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-700/30 focus:border-amber-700"
+                    className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-1 focus:ring-slate-500 focus:border-slate-500"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                     Erscheinungsjahr
                   </label>
                   <input
@@ -852,12 +852,12 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                     value={publicationYear}
                     onChange={(e) => setPublicationYear(e.target.value)}
                     placeholder="z.B. 1808"
-                    className="w-full px-3.5 py-2.5 border border-stone-300 rounded-xl text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-700/30 focus:border-amber-700"
+                    className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-1 focus:ring-slate-500 focus:border-slate-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                     Auflage / Band
                   </label>
                   <input
@@ -865,12 +865,12 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                     value={edition}
                     onChange={(e) => setEdition(e.target.value)}
                     placeholder="z.B. 1. Auflage, Band 1 & 2"
-                    className="w-full px-3.5 py-2.5 border border-stone-300 rounded-xl text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-700/30 focus:border-amber-700"
+                    className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-1 focus:ring-slate-500 focus:border-slate-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                     Sprache
                   </label>
                   <input
@@ -878,7 +878,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                     value={language}
                     onChange={(e) => setLanguage(e.target.value)}
                     placeholder="z.B. Deutsch (Frakturschrift)"
-                    className="w-full px-3.5 py-2.5 border border-stone-300 rounded-xl text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-700/30 focus:border-amber-700"
+                    className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-1 focus:ring-slate-500 focus:border-slate-500"
                   />
                 </div>
               </div>
@@ -890,7 +890,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
             <div className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                     Schätzwert (€)
                   </label>
                   <input
@@ -899,12 +899,12 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                     value={estimatedValue}
                     onChange={(e) => setEstimatedValue(e.target.value)}
                     placeholder="z.B. 850"
-                    className="w-full px-3.5 py-2.5 border border-stone-300 rounded-xl text-stone-900 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-amber-700/30 focus:border-amber-700"
+                    className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-slate-900 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-slate-500 focus:border-slate-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                     Notiz zum Schätzwert
                   </label>
                   <input
@@ -912,19 +912,19 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                     value={valueNote}
                     onChange={(e) => setValueNote(e.target.value)}
                     placeholder="z.B. Auktionshaus Lempertz Schätzung"
-                    className="w-full px-3.5 py-2.5 border border-stone-300 rounded-xl text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-700/30 focus:border-amber-700"
+                    className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-1 focus:ring-slate-500 focus:border-slate-500"
                   />
                 </div>
               </div>
 
-              <div className="border-t border-stone-200 pt-4">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-stone-500 mb-3">
+              <div className="border-t border-slate-200 pt-4">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">
                   eBay Verkaufs-Vorbereitung
                 </h4>
 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                       eBay Angebotstitel (max. 80 Zeichen)
                     </label>
                     <input
@@ -933,16 +933,16 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                       value={ebayTitle}
                       onChange={(e) => setEbayTitle(e.target.value)}
                       placeholder="z.B. Antiker Biedermeier Sekretär Kirschbaum um 1830 restauriert"
-                      className="w-full px-3.5 py-2.5 border border-stone-300 rounded-xl text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-700/30 focus:border-amber-700"
+                      className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-1 focus:ring-slate-500 focus:border-slate-500"
                     />
-                    <span className="text-[11px] text-stone-400 block text-right mt-0.5">
+                    <span className="text-[11px] text-slate-400 block text-right mt-0.5">
                       {ebayTitle.length} / 80 Zeichen
                     </span>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                      <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                         eBay Kategorie
                       </label>
                       <input
@@ -950,18 +950,18 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                         value={ebayCategory}
                         onChange={(e) => setEbayCategory(e.target.value)}
                         placeholder="z.B. Antiquitäten & Kunst > Möbel > Biedermeier"
-                        className="w-full px-3.5 py-2.5 border border-stone-300 rounded-xl text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-700/30 focus:border-amber-700"
+                        className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-1 focus:ring-slate-500 focus:border-slate-500"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                      <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                         eBay Zustand
                       </label>
                       <select
                         value={ebayCondition}
                         onChange={(e) => setEbayCondition(e.target.value)}
-                        className="w-full px-3 py-2.5 border border-stone-300 rounded-xl text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-700/30 focus:border-amber-700"
+                        className="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-1 focus:ring-slate-500 focus:border-slate-500"
                       >
                         <option value="">Auswählen...</option>
                         {EBAY_CONDITIONS.map((cond) => (
@@ -974,7 +974,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                    <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                       eBay Zustandsbeschreibung
                     </label>
                     <input
@@ -982,13 +982,13 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                       value={ebayConditionNote}
                       onChange={(e) => setEbayConditionNote(e.target.value)}
                       placeholder="z.B. Altersgemäße Patina, wohnfertig restauriert, Schlüssel vorhanden"
-                      className="w-full px-3.5 py-2.5 border border-stone-300 rounded-xl text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-700/30 focus:border-amber-700"
+                      className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-1 focus:ring-slate-500 focus:border-slate-500"
                     />
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                      <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                         Startpreis (€)
                       </label>
                       <input
@@ -997,12 +997,12 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                         value={startPrice}
                         onChange={(e) => setStartPrice(e.target.value)}
                         placeholder="z.B. 1.00"
-                        className="w-full px-3.5 py-2.5 border border-stone-300 rounded-xl text-stone-900 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-amber-700/30 focus:border-amber-700"
+                        className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-slate-900 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-slate-500 focus:border-slate-500"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                      <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                         Sofort-Kaufen-Preis (€)
                       </label>
                       <input
@@ -1011,7 +1011,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                         value={buyItNowPrice}
                         onChange={(e) => setBuyItNowPrice(e.target.value)}
                         placeholder="z.B. 950.00"
-                        className="w-full px-3.5 py-2.5 border border-stone-300 rounded-xl text-stone-900 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-amber-700/30 focus:border-amber-700"
+                        className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-slate-900 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-slate-500 focus:border-slate-500"
                       />
                     </div>
                   </div>
@@ -1022,10 +1022,10 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
         </form>
 
         {/* Modal Footer */}
-        <div className="px-6 py-4 bg-stone-50 border-t border-stone-200 flex items-center justify-between flex-shrink-0">
-          <div className="text-xs text-stone-500 font-medium">
+        <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between flex-shrink-0">
+          <div className="text-xs text-slate-500 font-medium">
             {savingProgress && (
-              <span className="flex items-center space-x-1.5 text-amber-800">
+              <span className="flex items-center space-x-1.5 text-slate-800">
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
                 <span>{savingProgress}</span>
               </span>
@@ -1037,7 +1037,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
               type="button"
               onClick={onClose}
               disabled={isSaving}
-              className="px-4 py-2 text-stone-700 hover:text-stone-900 text-sm font-medium transition-colors"
+              className="px-4 py-2 text-slate-700 hover:text-slate-900 text-sm font-medium transition-colors"
             >
               Abbrechen
             </button>
@@ -1046,7 +1046,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
               type="submit"
               form="item-form"
               disabled={isSaving || isAnalyzing}
-              className="flex items-center space-x-2 px-6 py-2.5 bg-amber-800 hover:bg-amber-900 disabled:bg-stone-300 text-white font-bold rounded-xl shadow transition-colors"
+              className="flex items-center space-x-2 px-6 py-2.5 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-300 text-white font-medium rounded-lg shadow-sm transition-colors"
             >
               {isSaving ? (
                 <>

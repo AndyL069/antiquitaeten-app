@@ -74,28 +74,28 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const displayError = localError || authError;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-sm animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
       <div
-        className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-stone-200 overflow-hidden transform transition-all"
+        className="relative w-full max-w-md bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden transform transition-all"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="px-6 pt-6 pb-4 bg-gradient-to-r from-amber-700 to-amber-900 text-white flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="p-2 bg-white/10 rounded-lg">
-              <Lock className="w-5 h-5 text-amber-200" />
+        <div className="px-6 pt-6 pb-4 bg-slate-900 text-white flex items-center justify-between">
+          <div className="flex items-center space-x-2.5">
+            <div className="p-2 bg-slate-800 rounded-lg">
+              <Lock className="w-5 h-5 text-slate-300" />
             </div>
             <div>
-              <h2 className="text-xl font-bold tracking-tight">
+              <h2 className="font-serif text-xl font-bold tracking-tight">
                 {mode === 'login' ? 'Willkommen zurück' : 'Konto erstellen'}
               </h2>
-              <p className="text-xs text-amber-200/80">Antiquitäten & Sammlungsstücke</p>
+              <p className="text-xs text-slate-400">Antiquitäten &amp; Sammlungsstücke</p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-colors"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
             title="Schließen"
           >
             <X className="w-5 h-5" />
@@ -103,13 +103,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
         </div>
 
         {/* Tab switcher */}
-        <div className="flex border-b border-stone-200 bg-stone-50">
+        <div className="flex border-b border-slate-200 bg-slate-50">
           <button
             type="button"
             className={`flex-1 py-3 text-sm font-semibold text-center transition-colors ${
               mode === 'login'
-                ? 'text-amber-800 border-b-2 border-amber-800 bg-white'
-                : 'text-stone-500 hover:text-stone-800'
+                ? 'text-slate-900 border-b-2 border-slate-900 bg-white'
+                : 'text-slate-500 hover:text-slate-800'
             }`}
             onClick={() => setMode('login')}
           >
@@ -119,8 +119,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             type="button"
             className={`flex-1 py-3 text-sm font-semibold text-center transition-colors ${
               mode === 'register'
-                ? 'text-amber-800 border-b-2 border-amber-800 bg-white'
-                : 'text-stone-500 hover:text-stone-800'
+                ? 'text-slate-900 border-b-2 border-slate-900 bg-white'
+                : 'text-slate-500 hover:text-slate-800'
             }`}
             onClick={() => setMode('register')}
           >
@@ -135,25 +135,25 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               <button
                 type="button"
                 onClick={handleAuthentikLogin}
-                className="w-full flex items-center justify-center space-x-2 py-2.5 px-4 bg-orange-600 hover:bg-orange-700 text-white font-medium rounded-xl shadow-sm transition-all duration-150 transform active:scale-[0.98]"
+                className="w-full flex items-center justify-center space-x-2 py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-white font-medium rounded-lg shadow-sm transition-all duration-150 transform active:scale-[0.98]"
               >
-                <Shield className="w-4 h-4 text-orange-200" />
+                <Shield className="w-4 h-4 text-slate-300" />
                 <span>Mit Authentik anmelden (SSO)</span>
               </button>
 
               <div className="relative flex items-center justify-center my-2">
-                <div className="border-t border-stone-200 w-full" />
-                <span className="bg-white px-3 text-xs text-stone-400 uppercase tracking-wider font-medium">
+                <div className="border-t border-slate-200 w-full" />
+                <span className="bg-white px-3 text-xs text-slate-400 uppercase tracking-wider font-medium">
                   oder mit E-Mail
                 </span>
-                <div className="border-t border-stone-200 w-full" />
+                <div className="border-t border-slate-200 w-full" />
               </div>
             </div>
           )}
 
           {/* Error Message */}
           {displayError && (
-            <div className="flex items-start space-x-2 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm animate-shake">
+            <div className="flex items-start space-x-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm animate-shake">
               <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5 text-red-500" />
               <div className="flex-1 font-medium">{displayError}</div>
             </div>
@@ -163,70 +163,70 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           <form onSubmit={handleSubmit} className="space-y-4">
             {mode === 'register' && (
               <div>
-                <label className="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1">
+                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                   Name (optional)
                 </label>
                 <div className="relative">
-                  <UserIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+                  <UserIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Max Mustermann"
-                    className="w-full pl-10 pr-3 py-2 border border-stone-300 rounded-xl text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-600 focus:border-amber-600 text-sm"
+                    className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-500/20 focus:border-slate-900 text-sm"
                   />
                 </div>
               </div>
             )}
 
             <div>
-              <label className="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1">
+              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                 E-Mail-Adresse
               </label>
               <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="ihre.email@example.de"
-                  className="w-full pl-10 pr-3 py-2 border border-stone-300 rounded-xl text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-600 focus:border-amber-600 text-sm"
+                  className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-500/20 focus:border-slate-900 text-sm"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1">
+              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                 Passwort
               </label>
               <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-3 py-2 border border-stone-300 rounded-xl text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-600 focus:border-amber-600 text-sm"
+                  className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-500/20 focus:border-slate-900 text-sm"
                 />
               </div>
             </div>
 
             {mode === 'register' && (
               <div>
-                <label className="block text-xs font-semibold text-stone-700 uppercase tracking-wider mb-1">
+                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                   Passwort bestätigen
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input
                     type="password"
                     required
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full pl-10 pr-3 py-2 border border-stone-300 rounded-xl text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-600 focus:border-amber-600 text-sm"
+                    className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-500/20 focus:border-slate-900 text-sm"
                   />
                 </div>
               </div>
@@ -235,7 +235,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full mt-2 flex items-center justify-center space-x-2 py-2.5 px-4 bg-amber-800 hover:bg-amber-900 disabled:bg-amber-400 text-white font-semibold rounded-xl shadow transition-colors"
+              className="w-full mt-2 flex items-center justify-center space-x-2 py-2.5 px-4 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-300 text-white font-semibold rounded-lg shadow-sm transition-colors"
             >
               {isLoading ? (
                 <>
@@ -249,14 +249,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           </form>
 
           {/* Toggle mode helper */}
-          <div className="text-center text-xs text-stone-500 pt-2">
+          <div className="text-center text-xs text-slate-500 pt-2">
             {mode === 'login' ? (
               <p>
                 Noch kein Konto?{' '}
                 <button
                   type="button"
                   onClick={() => setMode('register')}
-                  className="text-amber-800 font-semibold hover:underline"
+                  className="text-slate-900 font-semibold hover:underline"
                 >
                   Jetzt registrieren
                 </button>
@@ -267,7 +267,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 <button
                   type="button"
                   onClick={() => setMode('login')}
-                  className="text-amber-800 font-semibold hover:underline"
+                  className="text-slate-900 font-semibold hover:underline"
                 >
                   Hier anmelden
                 </button>
