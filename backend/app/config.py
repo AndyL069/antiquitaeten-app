@@ -8,7 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 class Settings(BaseSettings):
     SECRET_KEY: str = "antik-secret-key-change-in-production-2026"
-    DATABASE_URL: str = f"sqlite:///{BASE_DIR}/antik.db"
+    DATABASE_URL: str = f"sqlite:///{BASE_DIR.as_posix()}/antik.db"
     
     AUTH_SECRET: str = ""
     
@@ -57,4 +57,4 @@ class Settings(BaseSettings):
     )
 
 settings = Settings()
-settings.UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
+

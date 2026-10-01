@@ -84,10 +84,10 @@ try {
     & npm.cmd run dev
 } finally {
     Pop-Location
-    if ($BackendProcess -and -not $BackendProcess.HasExited) {
+    if ($BackendProcess -and !$BackendProcess.HasExited) {
         Write-Host ""
         Write-Host "Stoppe Backend-Prozess (PID: $($BackendProcess.Id))..." -ForegroundColor Yellow
-        Stop-Process -Id $BackendProcess.Id -Force -ErrorAction SilentlyContinue
+        taskkill.exe /PID $BackendProcess.Id /T /F 2>$null
         Write-Host "Backend gestoppt." -ForegroundColor Green
     }
 }

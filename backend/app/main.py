@@ -41,9 +41,8 @@ def healthcheck():
     return {"status": "ok"}
 
 # Mount uploaded files directory
-settings.UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
-app.mount("/uploads", StaticFiles(directory=str(settings.UPLOADS_DIR)), name="uploads")
-app.mount("/api/uploads", StaticFiles(directory=str(settings.UPLOADS_DIR)), name="api_uploads")
+app.mount("/uploads", StaticFiles(directory=str(settings.UPLOADS_DIR), check_dir=False), name="uploads")
+app.mount("/api/uploads", StaticFiles(directory=str(settings.UPLOADS_DIR), check_dir=False), name="api_uploads")
 
 # Include API routers
 app.include_router(auth.router)

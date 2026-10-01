@@ -195,7 +195,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       isAdmin: user?.role === 'ADMIN',
       isAuthenticated: !!user,
     }),
-    [user, loading, authError, providers, login, register, logout, refreshUser, clearAuthError]
+    [user, loading, authError, providers, login, register, logout, refreshUser, clearAuthError, setAuthError]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
