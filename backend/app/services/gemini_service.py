@@ -4,7 +4,7 @@ import json
 import math
 from typing import Any, Optional
 from fastapi import HTTPException
-from PIL import Image, ImageOps
+from PIL import Image, ImageOps, UnidentifiedImageError
 import google.genai as genai
 from google.genai import types
 from pydantic import BaseModel, ConfigDict
@@ -53,6 +53,8 @@ def _clean_float(val: Any) -> float:
     if val is None:
         return 0.0
     try:
+        if isinstance(val, str):
+            val = val.replace(",", ".").strip()
         f = float(val)
         return f if math.isfinite(f) else 0.0
     except (ValueError, TypeError):
@@ -94,23 +96,27 @@ def parse_gemini_response(data: dict) -> ItemDetailsAnalysis:
 
 def resize_image(image_bytes: bytes, max_dimension: int = 1600, quality: int = 85) -> bytes:
     """Downsamples image bytes using Pillow to max_dimension and converts to JPEG bytes."""
-    with Image.open(io.BytesIO(image_bytes)) as img:
-        img = ImageOps.exif_transpose(img)
+    try:
+        with Image.open(io.BytesIO(image_bytes)) as img:
+            img = ImageOps.exif_transpose(img)
 
-        if img.mode in ("RGBA", "LA", "P"):
-            img = img.convert("RGB")
-        elif img.mode != "RGB":
-            img = img.convert("RGB")
+            if img.mode != "RGB":
+                img = img.convert("RGB")
 
-        width, height = img.size
-        if max(width, height) > max_dimension:
-            scale = max_dimension / max(width, height)
-            new_size = (int(round(width * scale)), int(round(height * scale)))
-            img = img.resize(new_size, Image.Resampling.LANCZOS)
+            width, height = img.size
+            if max(width, height) > max_dimension:
+                scale = max_dimension / max(width, height)
+                new_size = (int(round(width * scale)), int(round(height * scale)))
+                img = img.resize(new_size, Image.Resampling.LANCZOS)
 
-        out_buf = io.BytesIO()
-        img.save(out_buf, format="JPEG", quality=quality, optimize=True)
-        return out_buf.getvalue()
+            out_buf = io.BytesIO()
+            img.save(out_buf, format="JPEG", quality=quality, optimize=True)
+            return out_buf.getvalue()
+    except (UnidentifiedImageError, OSError, ValueError) as exc:
+        raise HTTPException(
+            status_code=400,
+            detail="Ungültiges oder beschädigtes Bildformat",
+        ) from exc
 
 
 # Alias for compatibility
@@ -181,35 +187,77 @@ def extract_item_details_from_images(images: list[tuple[bytes, str]]) -> ItemDet
     contents: list[Any] = [*parts, prompt]
 
     client = genai.Client(api_key=api_key)
-    response = client.models.generate_content(
-        model=settings.GEMINI_MODEL,
-        contents=contents,
-        config=types.GenerateContentConfig(
-            temperature=0.0,
-            response_mime_type="application/json",
-            response_schema=ItemDetailsAnalysis,
-        ),
+    last_error: Optional[Exception] = None
+    last_result: Optional[ItemDetailsAnalysis] = None
+
+    for attempt in range(2):
+        try:
+            response = client.models.generate_content(
+                model=settings.GEMINI_MODEL,
+                contents=contents,
+                config=types.GenerateContentConfig(
+                    temperature=0.0,
+                    response_mime_type="application/json",
+                    response_schema=ItemDetailsAnalysis,
+                ),
+            )
+        except Exception as exc:
+            last_error = exc
+            if attempt == 0:
+                continue
+            raise HTTPException(
+                status_code=502,
+                detail=f"Gemini-Modellaufruf fehlgeschlagen: {str(exc)}",
+            ) from exc
+
+        if not response or not response.text:
+            last_error = HTTPException(status_code=502, detail="Leere Antwort vom Modell erhalten")
+            if attempt == 0:
+                continue
+            raise last_error
+
+        raw_text = response.text.strip()
+        # Strip markdown fences if present
+        if raw_text.startswith("```json"):
+            raw_text = raw_text[7:]
+        elif raw_text.startswith("```"):
+            raw_text = raw_text[3:]
+        if raw_text.endswith("```"):
+            raw_text = raw_text[:-3]
+        raw_text = raw_text.strip()
+
+        try:
+            data = json.loads(raw_text)
+        except json.JSONDecodeError as exc:
+            last_error = HTTPException(
+                status_code=502,
+                detail=f"Ungültige JSON-Antwort von Gemini: {str(exc)}",
+            )
+            if attempt == 0:
+                continue
+            raise last_error from exc
+
+        if isinstance(data, list):
+            data = data[0] if data and isinstance(data[0], dict) else {}
+
+        try:
+            parsed = parse_gemini_response(data)
+        except ValueError as exc:
+            last_error = HTTPException(status_code=502, detail=str(exc))
+            if attempt == 0:
+                continue
+            raise last_error from exc
+
+        last_result = parsed
+        if parsed.name:
+            return parsed
+
+    if last_result is not None:
+        return last_result
+
+    if isinstance(last_error, HTTPException):
+        raise last_error
+    raise HTTPException(
+        status_code=502,
+        detail=f"Gemini-Modellaufruf fehlgeschlagen: {str(last_error)}",
     )
-
-    if not response or not response.text:
-        raise HTTPException(status_code=502, detail="Leere Antwort vom Modell erhalten")
-
-    raw_text = response.text.strip()
-    # Strip markdown fences if present
-    if raw_text.startswith("```json"):
-        raw_text = raw_text[7:]
-    elif raw_text.startswith("```"):
-        raw_text = raw_text[3:]
-    if raw_text.endswith("```"):
-        raw_text = raw_text[:-3]
-    raw_text = raw_text.strip()
-
-    try:
-        data = json.loads(raw_text)
-    except json.JSONDecodeError as exc:
-        raise HTTPException(
-            status_code=502,
-            detail=f"Ungültige JSON-Antwort von Gemini: {str(exc)}",
-        ) from exc
-
-    return parse_gemini_response(data)

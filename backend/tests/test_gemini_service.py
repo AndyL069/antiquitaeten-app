@@ -221,3 +221,83 @@ def test_extract_item_details_from_images_multiple(mock_client_cls, monkeypatch)
     assert result.name == "Barock Engel"
     call_kwargs = mock_client.models.generate_content.call_args.kwargs
     assert any("mehrere Fotos DERSELBEN" in str(item) for item in call_kwargs["contents"])
+
+
+def test_parse_gemini_response_german_comma_floats():
+    data = {
+        "name": "Jugendstil Lampe",
+        "startPrice": "120,50",
+        "buyItNowPrice": "350,00",
+        "estimatedValue": "300,75",
+    }
+    result = parse_gemini_response(data)
+    assert result.startPrice == 120.50
+    assert result.buyItNowPrice == 350.00
+    assert result.estimatedValue == 300.75
+
+
+def test_resize_image_corrupted_format():
+    with pytest.raises(HTTPException) as excinfo:
+        resize_image(b"not an actual image file", max_dimension=1600)
+    assert excinfo.value.status_code == 400
+    assert "Ungültiges oder beschädigtes Bildformat" in excinfo.value.detail
+
+
+@patch("app.services.gemini_service.genai.Client")
+def test_extract_item_details_gemini_api_exception(mock_client_cls, monkeypatch):
+    monkeypatch.setattr(settings, "GOOGLE_API_KEY", "test-key")
+    mock_client = MagicMock()
+    mock_client_cls.return_value = mock_client
+    mock_client.models.generate_content.side_effect = RuntimeError("Network timeout connecting to Gemini API")
+
+    img = Image.new("RGB", (100, 100), color="blue")
+    buf = io.BytesIO()
+    img.save(buf, format="JPEG")
+
+    with pytest.raises(HTTPException) as excinfo:
+        extract_item_details_from_images([(buf.getvalue(), "image/jpeg")])
+
+    assert excinfo.value.status_code == 502
+    assert "Gemini-Modellaufruf fehlgeschlagen" in excinfo.value.detail
+
+
+@patch("app.services.gemini_service.genai.Client")
+def test_extract_item_details_retry_on_empty_name(mock_client_cls, monkeypatch):
+    monkeypatch.setattr(settings, "GOOGLE_API_KEY", "test-key")
+    mock_client = MagicMock()
+    mock_client_cls.return_value = mock_client
+
+    # First attempt returns empty name, second attempt returns valid name
+    res1 = MagicMock()
+    res1.text = json.dumps({"name": "", "category": "Möbel"})
+    res2 = MagicMock()
+    res2.text = json.dumps({"name": "Biedermeier Sekretär", "category": "Möbel"})
+    mock_client.models.generate_content.side_effect = [res1, res2]
+
+    img = Image.new("RGB", (100, 100), color="blue")
+    buf = io.BytesIO()
+    img.save(buf, format="JPEG")
+
+    result = extract_item_details_from_images([(buf.getvalue(), "image/jpeg")])
+    assert result.name == "Biedermeier Sekretär"
+    assert mock_client.models.generate_content.call_count == 2
+
+
+@patch("app.services.gemini_service.genai.Client")
+def test_extract_item_details_list_response_unwrapped(mock_client_cls, monkeypatch):
+    monkeypatch.setattr(settings, "GOOGLE_API_KEY", "test-key")
+    mock_client = MagicMock()
+    mock_client_cls.return_value = mock_client
+
+    mock_resp = MagicMock()
+    mock_resp.text = json.dumps([{"name": "Silberne Teekanne", "category": "Silber"}])
+    mock_client.models.generate_content.return_value = mock_resp
+
+    img = Image.new("RGB", (100, 100), color="blue")
+    buf = io.BytesIO()
+    img.save(buf, format="JPEG")
+
+    result = extract_item_details_from_images([(buf.getvalue(), "image/jpeg")])
+    assert result.name == "Silberne Teekanne"
+    assert result.category == "Silber"
+
