@@ -31,7 +31,8 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
   locations,
   onSaved,
 }) => {
-  const isEditMode = Boolean(item);
+  const [persistedItem, setPersistedItem] = useState<Item | null>(item || null);
+  const isEditMode = Boolean(persistedItem);
 
   // Form Fields State
   const [name, setName] = useState('');
@@ -71,6 +72,17 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Track preview URLs to revoke on unmount or reset
+  const previewUrlsRef = useRef<string[]>([]);
+  previewUrlsRef.current = newFilePreviews;
+
+  useEffect(() => {
+    return () => {
+      // Memory cleanup: revoke all created object URLs on unmount
+      previewUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, []);
+
   // UI & Loading States
   const [activeTab, setActiveTab] = useState<'basic' | 'text' | 'book' | 'ebay'>('basic');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -100,8 +112,11 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
 
     setError(null);
     setAiSuccessMessage(null);
+    newFilePreviews.forEach((url) => URL.revokeObjectURL(url));
     setNewFiles([]);
     setNewFilePreviews([]);
+
+    setPersistedItem(item || null);
 
     if (item) {
       // Edit mode
@@ -314,31 +329,56 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
 
       let savedItem: Item;
 
-      if (isEditMode && item) {
-        savedItem = await api.updateItem(item.id, payload);
+      if (isEditMode && persistedItem) {
+        savedItem = await api.updateItem(persistedItem.id, payload);
       } else {
         savedItem = await api.createItem(payload);
+        setPersistedItem(savedItem);
       }
 
       // Upload newly added photos
       if (newFiles.length > 0) {
         setSavingProgress(`Fotos werden hochgeladen (0 / ${newFiles.length})...`);
-        for (let i = 0; i < newFiles.length; i++) {
-          setSavingProgress(`Foto ${i + 1} von ${newFiles.length} wird hochgeladen...`);
+        const filesToUpload = [...newFiles];
+        const previewsToRevoke = [...newFilePreviews];
+
+        for (let i = 0; i < filesToUpload.length; i++) {
+          setSavingProgress(`Foto ${i + 1} von ${filesToUpload.length} wird hochgeladen...`);
           // If first photo of an item with no prior photos, mark as primary
-          const isPrimary = !isEditMode && i === 0;
-          await api.uploadPhoto(savedItem.id, newFiles[i], isPrimary);
+          const hasPriorPhotos = Boolean(
+            persistedItem?.photos && persistedItem.photos.length > 0
+          );
+          const isPrimary = !hasPriorPhotos && i === 0;
+          await api.uploadPhoto(savedItem.id, filesToUpload[i], isPrimary);
+
+          // Update remaining state so retry on partial failure only processes remaining files
+          const uploadedPreview = previewsToRevoke[i];
+          if (uploadedPreview) URL.revokeObjectURL(uploadedPreview);
+          setNewFiles((prev) => prev.filter((_, idx) => idx !== 0));
+          setNewFilePreviews((prev) => prev.filter((_, idx) => idx !== 0));
         }
       }
 
-      // If estimatedValue was provided and > 0, create an appraisal record if in create mode or new value
+      // Only add appraisal if new item (!isEditMode) OR if valuation value/note changed from latest appraisal
+      const latestAppraisal = (isEditMode && persistedItem?.appraisals && persistedItem.appraisals.length > 0)
+        ? persistedItem.appraisals[persistedItem.appraisals.length - 1]
+        : null;
+
       const parsedVal = parseFloat(estimatedValue);
-      if (!isNaN(parsedVal) && parsedVal > 0) {
+      const hasValuation = !isNaN(parsedVal) && parsedVal > 0;
+      const isNewAppraisalNeeded =
+        hasValuation &&
+        (!isEditMode ||
+          !latestAppraisal ||
+          latestAppraisal.value !== parsedVal ||
+          (latestAppraisal.note || '').trim() !== valueNote.trim());
+
+      if (isNewAppraisalNeeded) {
         try {
           await api.addAppraisal(savedItem.id, {
             value: parsedVal,
             currency: 'EUR',
-            note: valueNote.trim() || 'Schätzwert bei Anlage erfasst',
+            note: valueNote.trim() || (isEditMode ? 'Aktualisierter Schätzwert' : 'Schätzwert bei Anlage erfasst'),
           });
         } catch (appraisalErr) {
           console.warn('Appraisal record failed to save:', appraisalErr);
@@ -377,7 +417,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                 {isEditMode ? 'Objekt bearbeiten' : 'Neues Antiquitäten-Objekt anlegen'}
               </h2>
               <p className="text-xs text-amber-200/80">
-                {isEditMode ? item?.name : 'Fotos hochladen, mit KI scannen oder manuell erfassen'}
+                {isEditMode ? persistedItem?.name || name : 'Fotos hochladen, mit KI scannen oder manuell erfassen'}
               </p>
             </div>
           </div>
@@ -488,10 +528,10 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
           )}
 
           {/* Existing Photos in Edit Mode */}
-          {isEditMode && item?.photos && item.photos.length > 0 && (
+          {isEditMode && persistedItem?.photos && persistedItem.photos.length > 0 && (
             <div className="text-xs text-stone-500">
               <span className="font-semibold text-stone-700">Bereits gespeicherte Fotos:</span>{' '}
-              {item.photos.length} Fotos (weitere können über den Detail-Dialog verwaltet werden)
+              {persistedItem.photos.length} Fotos (weitere können über den Detail-Dialog verwaltet werden)
             </div>
           )}
 
