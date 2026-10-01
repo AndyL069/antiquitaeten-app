@@ -39,7 +39,8 @@ class AuthentikService:
             "token_endpoint": f"{issuer}/application/o/token/",
             "userinfo_endpoint": f"{issuer}/application/o/userinfo/",
         }
-        return fallback
+        self._cached_config = fallback
+        return self._cached_config
 
     async def get_authorization_url(self, redirect_uri: str, state: str) -> str:
         """Construct the Authentik OAuth2 authorization URL."""

@@ -1,4 +1,5 @@
 # backend/app/routes/auth.py
+import secrets
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Request, Response
 from fastapi.responses import RedirectResponse
@@ -177,7 +178,7 @@ def get_providers():
 
 @router.get("/authentik/login")
 async def authentik_login(request: Request, redirect: Optional[str] = "/"):
-    """Initiate Authentik OIDC OAuth authorization flow."""
+    """Initiate Authentik OIDC OAuth authorization flow with CSRF state protection."""
     if not authentik_service.is_configured():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -186,11 +187,36 @@ async def authentik_login(request: Request, redirect: Optional[str] = "/"):
 
     base_url = str(request.base_url).rstrip("/")
     callback_url = f"{base_url}/api/auth/authentik/callback"
+    oauth_state = secrets.token_urlsafe(32)
     auth_url = await authentik_service.get_authorization_url(
         redirect_uri=callback_url,
-        state=redirect or "/"
+        state=oauth_state
     )
-    return RedirectResponse(url=auth_url)
+
+    safe_redirect = (
+        redirect
+        if (redirect and redirect.startswith("/") and not redirect.startswith("//") and not redirect.startswith("/\\"))
+        else "/"
+    )
+
+    response = RedirectResponse(url=auth_url)
+    response.set_cookie(
+        key="oauth_state",
+        value=oauth_state,
+        httponly=True,
+        max_age=300,
+        path="/",
+        samesite="lax"
+    )
+    response.set_cookie(
+        key="oauth_redirect",
+        value=safe_redirect,
+        httponly=True,
+        max_age=300,
+        path="/",
+        samesite="lax"
+    )
+    return response
 
 @router.get("/authentik/callback")
 async def authentik_callback(
@@ -201,11 +227,28 @@ async def authentik_callback(
     db: Session = Depends(get_db)
 ):
     """Handle OIDC callback from Authentik."""
-    target_redirect = state if state and state.startswith("/") else "/"
+    # Open Redirect Prevention: validate redirect target or state
+    raw_target = request.cookies.get("oauth_redirect") or state
+    target_redirect = (
+        raw_target
+        if (raw_target and raw_target.startswith("/") and not raw_target.startswith("//") and not raw_target.startswith("/\\"))
+        else "/"
+    )
+
+    # CSRF Verification: verify request.cookies.get("oauth_state") == state
+    stored_state = request.cookies.get("oauth_state")
+    if not stored_state or not state or stored_state != state:
+        resp = RedirectResponse(url=f"{target_redirect}?error=invalid_state")
+        resp.delete_cookie("oauth_state", path="/")
+        resp.delete_cookie("oauth_redirect", path="/")
+        return resp
 
     if error or not code:
         err_msg = error or "missing_code"
-        return RedirectResponse(url=f"{target_redirect}?error={err_msg}")
+        resp = RedirectResponse(url=f"{target_redirect}?error={err_msg}")
+        resp.delete_cookie("oauth_state", path="/")
+        resp.delete_cookie("oauth_redirect", path="/")
+        return resp
 
     base_url = str(request.base_url).rstrip("/")
     callback_url = f"{base_url}/api/auth/authentik/callback"
@@ -216,7 +259,10 @@ async def authentik_callback(
 
         email = userinfo.get("email")
         if not email:
-            return RedirectResponse(url=f"{target_redirect}?error=no_email_returned")
+            resp = RedirectResponse(url=f"{target_redirect}?error=no_email_returned")
+            resp.delete_cookie("oauth_state", path="/")
+            resp.delete_cookie("oauth_redirect", path="/")
+            return resp
 
         email = email.lower().strip()
         name = userinfo.get("name") or userinfo.get("preferred_username")
@@ -243,6 +289,8 @@ async def authentik_callback(
         })
 
         redirect_response = RedirectResponse(url=target_redirect, status_code=status.HTTP_302_FOUND)
+        redirect_response.delete_cookie("oauth_state", path="/")
+        redirect_response.delete_cookie("oauth_redirect", path="/")
         redirect_response.set_cookie(
             key=settings.COOKIE_NAME,
             value=token,
@@ -253,4 +301,8 @@ async def authentik_callback(
         )
         return redirect_response
     except Exception as e:
-        return RedirectResponse(url=f"{target_redirect}?error=authentik_exchange_failed")
+        resp = RedirectResponse(url=f"{target_redirect}?error=authentik_exchange_failed")
+        resp.delete_cookie("oauth_state", path="/")
+        resp.delete_cookie("oauth_redirect", path="/")
+        return resp
+

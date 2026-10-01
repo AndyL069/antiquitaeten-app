@@ -155,21 +155,71 @@ def test_authentik_login_not_configured():
 
 def test_authentik_login_configured(monkeypatch):
     from app.config import settings
+    from app.services.authentik_service import authentik_service
+
     monkeypatch.setattr(settings, "AUTHENTIK_ISSUER", "https://auth.example.com")
     monkeypatch.setattr(settings, "AUTHENTIK_CLIENT_ID", "test-client-id")
     monkeypatch.setattr(settings, "AUTHENTIK_CLIENT_SECRET", "test-client-secret")
+
+    # Mock get_openid_config to avoid discovery network wait
+    async def mock_openid_config():
+        return {
+            "authorization_endpoint": "https://auth.example.com/application/o/authorize/",
+            "token_endpoint": "https://auth.example.com/application/o/token/",
+            "userinfo_endpoint": "https://auth.example.com/application/o/userinfo/",
+        }
+    monkeypatch.setattr(authentik_service, "get_openid_config", mock_openid_config)
     
     res = client.get("/api/auth/authentik/login?redirect=/catalog", follow_redirects=False)
     assert res.status_code in [302, 307]
     location = res.headers["location"]
     assert "https://auth.example.com" in location
     assert "test-client-id" in location
-    assert "state=%2Fcatalog" in location or "state=/catalog" in location
+    assert "oauth_state" in res.cookies
+    assert "oauth_redirect" in res.cookies
+    cookie_state = res.cookies["oauth_state"]
+    assert f"state={cookie_state}" in location
 
 def test_authentik_callback_error():
-    res = client.get("/api/auth/authentik/callback?error=access_denied&state=/catalog", follow_redirects=False)
+    res = client.get(
+        "/api/auth/authentik/callback?error=access_denied&state=csrf-123",
+        cookies={"oauth_state": "csrf-123", "oauth_redirect": "/catalog"},
+        follow_redirects=False
+    )
     assert res.status_code in [302, 307]
     assert "/catalog?error=access_denied" in res.headers["location"]
+
+def test_authentik_callback_csrf_mismatch():
+    # State parameter doesn't match cookie
+    res = client.get(
+        "/api/auth/authentik/callback?code=valid-code&state=attack-state",
+        cookies={"oauth_state": "legit-state", "oauth_redirect": "/catalog"},
+        follow_redirects=False
+    )
+    assert res.status_code in [302, 307]
+    assert "error=invalid_state" in res.headers["location"]
+
+def test_authentik_callback_open_redirect_prevention(monkeypatch):
+    from app.services.authentik_service import authentik_service
+
+    async def mock_exchange(code: str, redirect_uri: str):
+        return {"access_token": "mocked-authentik-token"}
+
+    async def mock_user_info(access_token: str):
+        return {"email": "open_redirect_user@antik.de", "name": "Open Redirect User"}
+
+    monkeypatch.setattr(authentik_service, "exchange_code_for_token", mock_exchange)
+    monkeypatch.setattr(authentik_service, "get_user_info", mock_user_info)
+
+    # Malicious redirect URL attempt with protocol-relative slash
+    res = client.get(
+        "/api/auth/authentik/callback?code=valid-code&state=csrf-token",
+        cookies={"oauth_state": "csrf-token", "oauth_redirect": "//evil.com"},
+        follow_redirects=False
+    )
+    assert res.status_code == 302
+    # Must fallback to "/" and not redirect to //evil.com
+    assert res.headers["location"] == "/"
 
 def test_authentik_callback_success(monkeypatch):
     from app.services.authentik_service import authentik_service
@@ -183,7 +233,11 @@ def test_authentik_callback_success(monkeypatch):
     monkeypatch.setattr(authentik_service, "exchange_code_for_token", mock_exchange)
     monkeypatch.setattr(authentik_service, "get_user_info", mock_user_info)
 
-    res = client.get("/api/auth/authentik/callback?code=valid-code&state=/catalog", follow_redirects=False)
+    res = client.get(
+        "/api/auth/authentik/callback?code=valid-code&state=valid-state-123",
+        cookies={"oauth_state": "valid-state-123", "oauth_redirect": "/catalog"},
+        follow_redirects=False
+    )
     assert res.status_code == 302
     assert res.headers["location"] == "/catalog"
     assert "access_token" in res.cookies
@@ -194,4 +248,20 @@ def test_authentik_callback_success(monkeypatch):
     assert me_res.json()["email"] == "sso_user@antik.de"
     assert me_res.json()["role"] == "ADMIN"
     assert me_res.json()["authProvider"] == "authentik"
+
+def test_register_password_length_validation():
+    # Password shorter than 8 chars
+    res_short = client.post("/api/auth/register", json={
+        "email": "short@antik.de",
+        "password": "short"
+    })
+    assert res_short.status_code == 422
+
+    # Password longer than 72 chars
+    res_long = client.post("/api/auth/register", json={
+        "email": "long@antik.de",
+        "password": "a" * 73
+    })
+    assert res_long.status_code == 422
+
 
