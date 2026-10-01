@@ -13,6 +13,7 @@ import {
 import type { User, UserRole } from '../types';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import { formatDate } from '../utils/formatters';
 
 export interface AdminUsersModalProps {
   isOpen: boolean;
@@ -217,7 +218,7 @@ export const AdminUsersModal: React.FC<AdminUsersModalProps> = ({ isOpen, onClos
                         </td>
 
                         <td className="py-3 px-4 text-slate-500 font-mono">
-                          {u.createdAt ? new Date(u.createdAt).toLocaleDateString('de-DE') : '—'}
+                          {u.createdAt ? formatDate(u.createdAt) : '—'}
                         </td>
 
                         <td className="py-3 px-4 text-right">

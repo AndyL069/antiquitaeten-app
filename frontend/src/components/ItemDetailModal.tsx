@@ -19,7 +19,7 @@ import {
 import type { Item } from '../types';
 import { CURRENCIES } from '../types';
 import api from '../services/api';
-import { getPhotoUrl } from '../utils/formatters';
+import { getPhotoUrl, formatDate } from '../utils/formatters';
 
 
 export interface ItemDetailModalProps {
@@ -445,7 +445,7 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                   <div className="flex justify-between py-2 px-3">
                     <span className="text-slate-500 font-medium">Erwerbsdatum:</span>
                     <span className="font-semibold text-slate-800 text-right">
-                      {item.acquisitionDate}
+                      {formatDate(item.acquisitionDate)}
                     </span>
                   </div>
                 )}
@@ -739,8 +739,10 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                         {a.appraiser && (
                           <span className="text-slate-500 font-medium">({a.appraiser})</span>
                         )}
-                        {a.appraisalDate && (
-                          <span className="text-slate-400">am {a.appraisalDate}</span>
+                        {(a.appraisalDate || a.createdAt) && (
+                          <span className="text-slate-400">
+                            am {formatDate(a.appraisalDate || a.createdAt)}
+                          </span>
                         )}
                       </div>
                       {a.note && <p className="text-slate-600 text-xs mt-0.5">{a.note}</p>}
@@ -889,7 +891,11 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                           }).format(s.amount)}
                         </span>
                         <span className="text-slate-600 font-medium">über {s.platform}</span>
-                        {s.soldAt && <span className="text-slate-400">am {s.soldAt}</span>}
+                        {(s.soldAt || s.createdAt) && (
+                          <span className="text-slate-400">
+                            am {formatDate(s.soldAt || s.createdAt)}
+                          </span>
+                        )}
                       </div>
                       {s.note && <p className="text-slate-500 text-xs mt-0.5">{s.note}</p>}
                     </div>

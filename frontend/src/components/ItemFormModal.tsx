@@ -45,6 +45,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
   const [condition, setCondition] = useState<string>('Gut');
   const [weight, setWeight] = useState('');
   const [locationId, setLocationId] = useState<string>('');
+  const [acquisitionDate, setAcquisitionDate] = useState('');
 
   const [description, setDescription] = useState('');
   const [context, setContext] = useState('');
@@ -130,6 +131,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
       setCondition(item.condition || 'Gut');
       setWeight(item.weight || '');
       setLocationId(item.locationId || '');
+      setAcquisitionDate(item.acquisitionDate ? item.acquisitionDate.split('T')[0] : '');
 
       setDescription(item.description || '');
       setContext(item.context || '');
@@ -164,6 +166,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
       setCondition('Gut');
       setWeight('');
       setLocationId('');
+      setAcquisitionDate('');
 
       setDescription('');
       setContext('');
@@ -312,6 +315,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
         condition: condition || null,
         weight: weight.trim() || null,
         locationId: locationId || null,
+        acquisitionDate: acquisitionDate || null,
         description: description.trim() || null,
         context: context.trim() || null,
         author: author.trim() || null,
@@ -743,7 +747,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
                     Abmessungen
@@ -766,6 +770,18 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
                     value={weight}
                     onChange={(e) => setWeight(e.target.value)}
                     placeholder="z.B. ca. 45 kg"
+                    className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-1 focus:ring-slate-500 focus:border-slate-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                    Erwerbsdatum
+                  </label>
+                  <input
+                    type="date"
+                    value={acquisitionDate}
+                    onChange={(e) => setAcquisitionDate(e.target.value)}
                     className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-1 focus:ring-slate-500 focus:border-slate-500"
                   />
                 </div>
