@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import CatalogView from './components/CatalogView';
@@ -9,6 +9,16 @@ import AdminUsersModal from './components/AdminUsersModal';
 import AuthModal from './components/AuthModal';
 import type { Item, Location } from './types';
 import api from './services/api';
+import { useOnlineStatus } from './hooks/useOnlineStatus';
+import {
+  getCachedItems,
+  saveItems,
+  getCachedLocations,
+  saveLocations,
+  getSyncMetadata,
+  setSyncMetadata,
+} from './services/offlineStorage';
+import { formatDate } from './utils/formatters';
 import {
   Sparkles,
   Lock,
@@ -28,6 +38,8 @@ interface ToastNotification {
 
 function MainApp() {
   const { isAuthenticated, loading: authLoading, isAdmin } = useAuth();
+  const { isOnline } = useOnlineStatus();
+  const [lastSyncIso, setLastSyncIso] = useState<string | null>(null);
 
   // Navigation State
   const [activeTab, setActiveTab] = useState<'catalog' | 'locations' | 'users'>('catalog');
@@ -36,6 +48,8 @@ function MainApp() {
   const [items, setItems] = useState<Item[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
   const [loadingItems, setLoadingItems] = useState(false);
+  const itemsRef = useRef(items);
+  itemsRef.current = items;
 
   // Modals State
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
@@ -62,16 +76,25 @@ function MainApp() {
   // Load items
   const loadItems = useCallback(async () => {
     if (!isAuthenticated) return;
-    setLoadingItems(true);
+    if (itemsRef.current.length === 0) {
+      setLoadingItems(true);
+    }
     try {
       const data = await api.getItems();
       setItems(data);
+      const now = Date.now();
+      const iso = new Date().toISOString();
+      await saveItems(data);
+      await setSyncMetadata({ lastSyncTime: now, lastSyncIso: iso });
+      setLastSyncIso(iso);
     } catch (err) {
-      console.error('Failed to load items:', err);
+      if (isOnline) {
+        console.error('Failed to load items:', err);
+      }
     } finally {
       setLoadingItems(false);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, isOnline]);
 
   // Load locations
   const loadLocations = useCallback(async () => {
@@ -79,21 +102,64 @@ function MainApp() {
     try {
       const tree = await api.getLocations(false);
       setLocations(tree);
+      await saveLocations(tree);
     } catch (err) {
-      console.error('Failed to load locations:', err);
+      if (isOnline) {
+        console.error('Failed to load locations:', err);
+      }
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, isOnline]);
 
   // Load data on mount & auth change
   useEffect(() => {
+    let isMounted = true;
     if (isAuthenticated) {
+      // 1. Immediately populate from IndexedDB cache with 0 delay
+      Promise.all([
+        getCachedItems(),
+        getCachedLocations(),
+        getSyncMetadata(),
+      ])
+        .then(([cachedItems, cachedLocs, meta]) => {
+          if (!isMounted) return;
+          if (cachedItems && cachedItems.length > 0) {
+            setItems(cachedItems);
+          }
+          if (cachedLocs && cachedLocs.length > 0) {
+            setLocations(cachedLocs);
+          }
+          if (meta?.lastSyncIso) {
+            setLastSyncIso(meta.lastSyncIso);
+          }
+        })
+        .catch((err) => {
+          console.warn('Failed to load offline cache on mount:', err);
+        });
+
+      // 2. Fetch fresh data from API
       loadItems();
       loadLocations();
     } else {
       setItems([]);
       setLocations([]);
+      setLastSyncIso(null);
     }
+    return () => {
+      isMounted = false;
+    };
   }, [isAuthenticated, loadItems, loadLocations]);
+
+  // Reconnect detection: toast & auto-refresh
+  const wasOnlineRef = useRef(isOnline);
+
+  useEffect(() => {
+    if (!wasOnlineRef.current && isOnline) {
+      addToast('Wieder online – Katalog aktualisiert', 'success');
+      loadItems();
+      loadLocations();
+    }
+    wasOnlineRef.current = isOnline;
+  }, [isOnline, addToast, loadItems, loadLocations]);
 
   // Handlers for Item lifecycle
   const handleItemCreated = (newItem: Item) => {
@@ -121,6 +187,10 @@ function MainApp() {
   };
 
   const handleNewItemClick = () => {
+    if (!isOnline) {
+      addToast('Im Offline-Modus können keine neuen Objekte angelegt werden.', 'info');
+      return;
+    }
     if (!isAuthenticated) {
       setIsAuthOpen(true);
       return;
@@ -147,7 +217,24 @@ function MainApp() {
         onNewItem={handleNewItemClick}
         onOpenAuth={() => setIsAuthOpen(true)}
         onOpenAdminUsers={() => setIsAdminUsersOpen(true)}
+        isOnline={isOnline}
+        items={items}
+        onPreloadComplete={() => addToast('Bilder erfolgreich im Offline-Speicher gesichert!', 'success')}
       />
+
+      {/* Offline Status Banner */}
+      {!isOnline && (
+        <div className="bg-slate-800 text-slate-200 border-b border-slate-700 px-4 py-2 text-xs flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+            <span>
+              <strong>Offline-Modus aktiv:</strong> Sie betrachten den lokal gespeicherten Katalog
+              {lastSyncIso && ` (Stand: ${formatDate(lastSyncIso)})`}.
+            </span>
+          </div>
+          <span className="text-slate-400">Schreib-Aktionen sind deaktiviert</span>
+        </div>
+      )}
 
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -231,6 +318,7 @@ function MainApp() {
                   loadLocations();
                   loadItems();
                 }}
+                isOnline={isOnline}
               />
             )}
           </div>
@@ -250,6 +338,7 @@ function MainApp() {
         }}
         onDelete={handleItemDeleted}
         onItemUpdated={handleItemUpdated}
+        isOnline={isOnline}
       />
 
       {/* Item Form Modal (Create Mode) */}

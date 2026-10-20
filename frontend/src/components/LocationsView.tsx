@@ -19,6 +19,7 @@ import api from '../services/api';
 export interface LocationsViewProps {
   locations: Location[]; // hierarchical tree
   onRefresh: () => void;
+  isOnline?: boolean;
 }
 
 interface LocationModalState {
@@ -30,7 +31,7 @@ interface LocationModalState {
   description: string;
 }
 
-export const LocationsView: React.FC<LocationsViewProps> = ({ locations, onRefresh }) => {
+export const LocationsView: React.FC<LocationsViewProps> = ({ locations, onRefresh, isOnline = true }) => {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [modalState, setModalState] = useState<LocationModalState>({
     isOpen: false,
@@ -232,24 +233,39 @@ export const LocationsView: React.FC<LocationsViewProps> = ({ locations, onRefre
             <button
               type="button"
               onClick={() => handleNewChild(node)}
-              className="p-1.5 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
-              title="Unterstandort hinzufügen"
+              disabled={!isOnline}
+              className={`p-1.5 rounded-lg transition-colors ${
+                !isOnline
+                  ? 'text-slate-300 opacity-50 cursor-not-allowed'
+                  : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
+              }`}
+              title={!isOnline ? 'Im Offline-Modus nicht verfügbar' : 'Unterstandort hinzufügen'}
             >
               <Plus className="w-4 h-4" />
             </button>
             <button
               type="button"
               onClick={() => handleEdit(node)}
-              className="p-1.5 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
-              title="Standort bearbeiten"
+              disabled={!isOnline}
+              className={`p-1.5 rounded-lg transition-colors ${
+                !isOnline
+                  ? 'text-slate-300 opacity-50 cursor-not-allowed'
+                  : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
+              }`}
+              title={!isOnline ? 'Im Offline-Modus nicht verfügbar' : 'Standort bearbeiten'}
             >
               <Edit2 className="w-3.5 h-3.5" />
             </button>
             <button
               type="button"
               onClick={() => handleDelete(node)}
-              className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-              title="Standort löschen"
+              disabled={!isOnline}
+              className={`p-1.5 rounded-lg transition-colors ${
+                !isOnline
+                  ? 'text-slate-300 opacity-50 cursor-not-allowed'
+                  : 'text-slate-400 hover:text-red-600 hover:bg-red-50'
+              }`}
+              title={!isOnline ? 'Im Offline-Modus nicht verfügbar' : 'Standort löschen'}
             >
               <Trash2 className="w-3.5 h-3.5" />
             </button>
@@ -303,7 +319,13 @@ export const LocationsView: React.FC<LocationsViewProps> = ({ locations, onRefre
           <button
             type="button"
             onClick={handleNewRoot}
-            className="flex items-center space-x-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-semibold shadow-sm transition-colors"
+            disabled={!isOnline}
+            className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-xs font-semibold shadow-sm transition-colors ${
+              !isOnline
+                ? 'bg-slate-300 text-slate-500 opacity-50 cursor-not-allowed'
+                : 'bg-slate-900 hover:bg-slate-800 text-white'
+            }`}
+            title={!isOnline ? 'Im Offline-Modus nicht verfügbar' : 'Neuen Hauptstandort anlegen'}
           >
             <Plus className="w-4 h-4" />
             <span>Neuer Hauptstandort</span>
@@ -327,7 +349,13 @@ export const LocationsView: React.FC<LocationsViewProps> = ({ locations, onRefre
             <button
               type="button"
               onClick={handleNewRoot}
-              className="inline-flex items-center space-x-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors"
+              disabled={!isOnline}
+              className={`inline-flex items-center space-x-2 px-4 py-2 rounded-lg text-xs font-semibold shadow-sm transition-colors ${
+                !isOnline
+                  ? 'bg-slate-300 text-slate-500 opacity-50 cursor-not-allowed'
+                  : 'bg-slate-900 hover:bg-slate-800 text-white'
+              }`}
+              title={!isOnline ? 'Im Offline-Modus nicht verfügbar' : 'Ersten Standort anlegen'}
             >
               <Plus className="w-4 h-4" />
               <span>Ersten Standort anlegen</span>
@@ -410,8 +438,8 @@ export const LocationsView: React.FC<LocationsViewProps> = ({ locations, onRefre
                 </button>
                 <button
                   type="submit"
-                  disabled={isSubmitting}
-                  className="px-5 py-2 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-300 text-white rounded-lg text-xs font-semibold shadow-sm flex items-center space-x-1.5 transition-colors"
+                  disabled={isSubmitting || !isOnline}
+                  className="px-5 py-2 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-300 disabled:cursor-not-allowed text-white rounded-lg text-xs font-semibold shadow-sm flex items-center space-x-1.5 transition-colors"
                 >
                   {isSubmitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                   <span>Speichern</span>

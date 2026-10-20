@@ -29,6 +29,7 @@ export interface ItemDetailModalProps {
   onEdit: (item: Item) => void;
   onDelete: (itemId: string) => void;
   onItemUpdated: (updatedItem: Item) => void;
+  isOnline?: boolean;
 }
 
 export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
@@ -38,6 +39,7 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
   onEdit,
   onDelete,
   onItemUpdated,
+  isOnline = true,
 }) => {
   const [activePhotoIndex, setActivePhotoIndex] = useState(0);
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
@@ -256,8 +258,13 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
             <button
               type="button"
               onClick={() => onEdit(item)}
-              className="flex items-center space-x-1.5 px-2.5 sm:px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-medium shadow transition-colors"
-              title="Objekt bearbeiten"
+              disabled={!isOnline}
+              className={`flex items-center space-x-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-medium shadow transition-colors ${
+                !isOnline
+                  ? 'bg-slate-700/60 text-slate-400 opacity-50 cursor-not-allowed'
+                  : 'bg-slate-800 hover:bg-slate-700 text-white'
+              }`}
+              title={!isOnline ? 'Im Offline-Modus nicht verfügbar' : 'Objekt bearbeiten'}
             >
               <Edit3 className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Bearbeiten</span>
@@ -301,9 +308,13 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                         <button
                           type="button"
                           onClick={() => handleSetPrimary(currentPhoto.id)}
-                          disabled={photoActionLoading === currentPhoto.id}
-                          className="px-2.5 py-1 bg-white/90 hover:bg-white text-slate-800 text-xs font-medium rounded shadow border border-slate-200 flex items-center space-x-1"
-                          title="Als primäres Foto setzen"
+                          disabled={!isOnline || photoActionLoading === currentPhoto.id}
+                          className={`px-2.5 py-1 text-xs font-medium rounded shadow border flex items-center space-x-1 ${
+                            !isOnline
+                              ? 'bg-slate-100 text-slate-400 border-slate-200 opacity-50 cursor-not-allowed'
+                              : 'bg-white/90 hover:bg-white text-slate-800 border-slate-200'
+                          }`}
+                          title={!isOnline ? 'Im Offline-Modus nicht verfügbar' : 'Als primäres Foto setzen'}
                         >
                           <Star className="w-3 h-3 text-slate-500" />
                           <span>Als Hauptfoto</span>
@@ -312,9 +323,13 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                       <button
                         type="button"
                         onClick={() => handleDeletePhoto(currentPhoto.id)}
-                        disabled={photoActionLoading === currentPhoto.id}
-                        className="p-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg shadow"
-                        title="Foto löschen"
+                        disabled={!isOnline || photoActionLoading === currentPhoto.id}
+                        className={`p-1.5 rounded-lg shadow ${
+                          !isOnline
+                            ? 'bg-slate-400 text-white/70 opacity-50 cursor-not-allowed'
+                            : 'bg-rose-600 hover:bg-rose-700 text-white'
+                        }`}
+                        title={!isOnline ? 'Im Offline-Modus nicht verfügbar' : 'Foto löschen'}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -362,9 +377,13 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  disabled={isUploadingPhoto}
-                  className="w-16 h-16 rounded-xl border-2 border-dashed border-slate-300 hover:border-slate-600 flex flex-col items-center justify-center text-slate-500 hover:text-slate-800 transition-colors flex-shrink-0 bg-slate-50"
-                  title="Weiteres Foto hinzufügen"
+                  disabled={!isOnline || isUploadingPhoto}
+                  className={`w-16 h-16 rounded-xl border-2 border-dashed flex flex-col items-center justify-center transition-colors flex-shrink-0 bg-slate-50 ${
+                    !isOnline
+                      ? 'border-slate-200 text-slate-300 opacity-50 cursor-not-allowed'
+                      : 'border-slate-300 hover:border-slate-600 text-slate-500 hover:text-slate-800'
+                  }`}
+                  title={!isOnline ? 'Im Offline-Modus nicht verfügbar' : 'Weiteres Foto hinzufügen'}
                 >
                   {isUploadingPhoto ? (
                     <Loader2 className="w-5 h-5 animate-spin text-slate-700" />
@@ -618,14 +637,27 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                   Wertschätzungen ({appraisals.length})
                 </h3>
               </div>
-              <button
-                type="button"
-                onClick={() => setShowAppraisalForm(!showAppraisalForm)}
-                className="flex items-center space-x-1 px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 rounded-lg text-xs font-medium transition-colors"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Schätzung erfassen</span>
-              </button>
+              <div className="flex items-center space-x-2">
+                {!isOnline && (
+                  <span className="text-[11px] text-slate-400 italic hidden sm:inline">
+                    Wertschätzungen können nur online hinzugefügt werden
+                  </span>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setShowAppraisalForm(!showAppraisalForm)}
+                  disabled={!isOnline}
+                  className={`flex items-center space-x-1 px-3 py-1 rounded-lg text-xs font-medium transition-colors border ${
+                    !isOnline
+                      ? 'bg-slate-100 text-slate-400 border-slate-200 opacity-50 cursor-not-allowed'
+                      : 'bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300'
+                  }`}
+                  title={!isOnline ? 'Wertschätzungen können nur online hinzugefügt werden' : 'Schätzung erfassen'}
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Schätzung erfassen</span>
+                </button>
+              </div>
             </div>
 
             {/* Inline Add Appraisal Form */}
@@ -714,8 +746,8 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                   </button>
                   <button
                     type="submit"
-                    disabled={isSubmittingAppraisal}
-                    className="px-4 py-1.5 bg-slate-900 text-white rounded-lg text-xs font-medium hover:bg-slate-800 disabled:bg-slate-300"
+                    disabled={!isOnline || isSubmittingAppraisal}
+                    className="px-4 py-1.5 bg-slate-900 text-white rounded-lg text-xs font-medium hover:bg-slate-800 disabled:bg-slate-300 disabled:cursor-not-allowed"
                   >
                     {isSubmittingAppraisal ? 'Wird gespeichert...' : 'Schätzung speichern'}
                   </button>
@@ -750,8 +782,13 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                     <button
                       type="button"
                       onClick={() => handleDeleteAppraisal(a.id)}
-                      className="p-1 text-slate-400 hover:text-rose-600 rounded transition-colors"
-                      title="Schätzung löschen"
+                      disabled={!isOnline}
+                      className={`p-1 rounded transition-colors ${
+                        !isOnline
+                          ? 'text-slate-300 opacity-50 cursor-not-allowed'
+                          : 'text-slate-400 hover:text-rose-600'
+                      }`}
+                      title={!isOnline ? 'Im Offline-Modus nicht verfügbar' : 'Schätzung löschen'}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -772,14 +809,27 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                   Verkäufe ({sales.length})
                 </h3>
               </div>
-              <button
-                type="button"
-                onClick={() => setShowSaleForm(!showSaleForm)}
-                className="flex items-center space-x-1 px-3 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200 rounded-lg text-xs font-medium transition-colors"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Verkauf erfassen</span>
-              </button>
+              <div className="flex items-center space-x-2">
+                {!isOnline && (
+                  <span className="text-[11px] text-slate-400 italic hidden sm:inline">
+                    Verkäufe können nur online eingetragen werden
+                  </span>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setShowSaleForm(!showSaleForm)}
+                  disabled={!isOnline}
+                  className={`flex items-center space-x-1 px-3 py-1 rounded-lg text-xs font-medium transition-colors border ${
+                    !isOnline
+                      ? 'bg-slate-100 text-slate-400 border-slate-200 opacity-50 cursor-not-allowed'
+                      : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200'
+                  }`}
+                  title={!isOnline ? 'Verkäufe können nur online eingetragen werden' : 'Verkauf erfassen'}
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Verkauf erfassen</span>
+                </button>
+              </div>
             </div>
 
             {/* Inline Add Sale Form */}
@@ -868,8 +918,8 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                   </button>
                   <button
                     type="submit"
-                    disabled={isSubmittingSale}
-                    className="px-4 py-1.5 bg-emerald-700 text-white rounded-lg text-xs font-medium hover:bg-emerald-800 disabled:bg-slate-300"
+                    disabled={!isOnline || isSubmittingSale}
+                    className="px-4 py-1.5 bg-emerald-700 text-white rounded-lg text-xs font-medium hover:bg-emerald-800 disabled:bg-slate-300 disabled:cursor-not-allowed"
                   >
                     {isSubmittingSale ? 'Wird gespeichert...' : 'Verkauf speichern'}
                   </button>
@@ -902,8 +952,13 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
                     <button
                       type="button"
                       onClick={() => handleDeleteSale(s.id)}
-                      className="p-1 text-slate-400 hover:text-rose-600 rounded transition-colors"
-                      title="Verkauf löschen"
+                      disabled={!isOnline}
+                      className={`p-1 rounded transition-colors ${
+                        !isOnline
+                          ? 'text-slate-300 opacity-50 cursor-not-allowed'
+                          : 'text-slate-400 hover:text-rose-600'
+                      }`}
+                      title={!isOnline ? 'Im Offline-Modus nicht verfügbar' : 'Verkauf löschen'}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -921,7 +976,13 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({
           <button
             type="button"
             onClick={() => setConfirmDeleteModal(true)}
-            className="flex items-center space-x-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 text-rose-600 hover:bg-rose-50 rounded-lg text-xs font-medium transition-colors"
+            disabled={!isOnline}
+            className={`flex items-center space-x-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-lg text-xs font-medium transition-colors ${
+              !isOnline
+                ? 'text-slate-400 opacity-50 cursor-not-allowed'
+                : 'text-rose-600 hover:bg-rose-50'
+            }`}
+            title={!isOnline ? 'Im Offline-Modus nicht verfügbar' : 'Objekt löschen'}
           >
             <Trash2 className="w-4 h-4" />
             <span>Objekt löschen</span>

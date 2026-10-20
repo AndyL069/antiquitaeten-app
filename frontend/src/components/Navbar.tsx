@@ -13,8 +13,13 @@ import {
   Menu,
   X,
   Sparkles,
+  CloudDownload,
+  Loader2,
+  Check,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import type { Item } from '../types';
+import { preloadCatalogImages } from '../services/imagePreloader';
 
 export interface NavbarProps {
   activeTab: 'catalog' | 'locations' | 'users';
@@ -22,6 +27,9 @@ export interface NavbarProps {
   onNewItem: () => void;
   onOpenAuth: () => void;
   onOpenAdminUsers: () => void;
+  isOnline?: boolean;
+  items?: Item[];
+  onPreloadComplete?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -30,11 +38,36 @@ export const Navbar: React.FC<NavbarProps> = ({
   onNewItem,
   onOpenAuth,
   onOpenAdminUsers,
+  isOnline = true,
+  items = [],
+  onPreloadComplete,
 }) => {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const [preloadState, setPreloadState] = useState<'idle' | 'loading' | 'done'>('idle');
+  const [preloadProgress, setPreloadProgress] = useState<{ loaded: number; total: number }>({ loaded: 0, total: 0 });
+
+  const handlePreloadImages = async () => {
+    if (!isOnline || preloadState === 'loading' || !items || items.length === 0) return;
+    setPreloadState('loading');
+    setPreloadProgress({ loaded: 0, total: 0 });
+    try {
+      await preloadCatalogImages(items, (loaded, total) => {
+        setPreloadProgress({ loaded, total });
+      });
+      setPreloadState('done');
+      onPreloadComplete?.();
+      setTimeout(() => {
+        setPreloadState('idle');
+      }, 4000);
+    } catch (err) {
+      console.error('Image preloading error:', err);
+      setPreloadState('idle');
+    }
+  };
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -120,11 +153,66 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Right Action Buttons */}
           <div className="hidden md:flex items-center space-x-3">
+            {/* Offline Image Preloader */}
+            {isAuthenticated && (
+              <button
+                type="button"
+                onClick={handlePreloadImages}
+                disabled={!isOnline || preloadState === 'loading' || items.length === 0}
+                className={`flex items-center space-x-2 px-3 py-2 border rounded-lg text-sm font-medium transition-all ${
+                  !isOnline || items.length === 0
+                    ? 'border-slate-200 bg-slate-100 text-slate-400 opacity-50 cursor-not-allowed'
+                    : preloadState === 'loading'
+                    ? 'border-slate-300 bg-slate-50 text-slate-700'
+                    : preloadState === 'done'
+                    ? 'border-emerald-300 bg-emerald-50 text-emerald-800'
+                    : 'border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 shadow-sm'
+                }`}
+                title={
+                  !isOnline
+                    ? 'Vorladen erfordert Internetverbindung'
+                    : items.length === 0
+                    ? 'Keine Objekte zum Vorladen vorhanden'
+                    : preloadState === 'loading'
+                    ? 'Bilder werden vorgeladen...'
+                    : preloadState === 'done'
+                    ? 'Alle Bilder erfolgreich im Browser-Cache gespeichert'
+                    : 'Katalogfotos für Offline-Nutzung lokal cachen'
+                }
+              >
+                {preloadState === 'loading' ? (
+                  <Loader2 className="w-4 h-4 animate-spin text-slate-600" />
+                ) : preloadState === 'done' ? (
+                  <Check className="w-4 h-4 text-emerald-600" />
+                ) : (
+                  <CloudDownload className="w-4 h-4 text-slate-600" />
+                )}
+                <span>
+                  {preloadState === 'loading'
+                    ? 'Laden...'
+                    : preloadState === 'done'
+                    ? 'Vorgeladen'
+                    : 'Bilder vorladen'}
+                </span>
+                {preloadState === 'loading' && preloadProgress.total > 0 && (
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-slate-200 text-slate-800 ml-1">
+                    {preloadProgress.loaded}/{preloadProgress.total}
+                  </span>
+                )}
+              </button>
+            )}
+
             {/* New Item Action Button */}
             <button
               type="button"
               onClick={onNewItem}
-              className="flex items-center space-x-2 px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white text-sm font-medium rounded-lg shadow-sm transition-all duration-150 transform active:scale-98"
+              disabled={!isOnline}
+              className={`flex items-center space-x-2 px-3.5 py-2 text-white text-sm font-medium rounded-lg shadow-sm transition-all duration-150 ${
+                !isOnline
+                  ? 'bg-slate-400 opacity-50 cursor-not-allowed'
+                  : 'bg-slate-900 hover:bg-slate-800 transform active:scale-98'
+              }`}
+              title={!isOnline ? 'Im Offline-Modus nicht verfügbar' : 'Neues Objekt anlegen'}
             >
               <Plus className="w-4 h-4" />
               <span>Neues Objekt</span>
@@ -209,8 +297,13 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               type="button"
               onClick={onNewItem}
-              className="p-2 bg-slate-900 text-white rounded-lg shadow-sm"
-              title="Neues Objekt"
+              disabled={!isOnline}
+              className={`p-2 rounded-lg shadow-sm ${
+                !isOnline
+                  ? 'bg-slate-400 text-white/70 opacity-50 cursor-not-allowed'
+                  : 'bg-slate-900 text-white'
+              }`}
+              title={!isOnline ? 'Im Offline-Modus nicht verfügbar' : 'Neues Objekt anlegen'}
             >
               <Plus className="w-5 h-5" />
             </button>
@@ -267,6 +360,50 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               <Users className="w-5 h-5 text-slate-600" />
               <span>Benutzerverwaltung (Admin)</span>
+            </button>
+          )}
+
+          {isAuthenticated && (
+            <button
+              type="button"
+              onClick={handlePreloadImages}
+              disabled={!isOnline || preloadState === 'loading' || items.length === 0}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium border border-slate-200 transition-colors ${
+                !isOnline || items.length === 0
+                  ? 'bg-slate-50 text-slate-400 opacity-50 cursor-not-allowed'
+                  : preloadState === 'done'
+                  ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                  : 'text-slate-700 hover:bg-slate-50'
+              }`}
+              title={
+                !isOnline
+                  ? 'Vorladen erfordert Internetverbindung'
+                  : items.length === 0
+                  ? 'Keine Objekte zum Vorladen vorhanden'
+                  : 'Katalogfotos für Offline-Nutzung lokal cachen'
+              }
+            >
+              <div className="flex items-center space-x-2.5">
+                {preloadState === 'loading' ? (
+                  <Loader2 className="w-4 h-4 animate-spin text-slate-600" />
+                ) : preloadState === 'done' ? (
+                  <Check className="w-4 h-4 text-emerald-600" />
+                ) : (
+                  <CloudDownload className="w-4 h-4 text-slate-600" />
+                )}
+                <span>
+                  {preloadState === 'loading'
+                    ? 'Bilder laden...'
+                    : preloadState === 'done'
+                    ? 'Bilder vorgeladen'
+                    : 'Bilder vorladen'}
+                </span>
+              </div>
+              {preloadState === 'loading' && preloadProgress.total > 0 && (
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 text-slate-700">
+                  {preloadProgress.loaded}/{preloadProgress.total}
+                </span>
+              )}
             </button>
           )}
 
