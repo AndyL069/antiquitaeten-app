@@ -11,11 +11,14 @@ import React, {
 import type { User, AuthProvidersResponse, LoginCredentials, RegisterData } from '../types';
 import api from '../services/api';
 
+export const CACHED_USER_KEY = 'antiquitaeten_cached_user';
+
 export interface AuthContextType {
   user: User | null;
   loading: boolean;
   authError: string | null;
   providers: AuthProvidersResponse;
+  isOfflineSession: boolean;
   login: (emailOrData: string | LoginCredentials, password?: string) => Promise<User>;
   register: (
     emailOrData: string | RegisterData,
@@ -36,6 +39,83 @@ export interface AuthProviderProps {
   children: ReactNode;
 }
 
+function getStoredUser(): User | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(CACHED_USER_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === 'object' && parsed.id) {
+      return parsed as User;
+    }
+  } catch (err) {
+    console.warn('Failed to parse cached user from localStorage:', err);
+  }
+  return null;
+}
+
+function cacheUser(user: User | null): void {
+  if (typeof window === 'undefined') return;
+  try {
+    if (user) {
+      localStorage.setItem(CACHED_USER_KEY, JSON.stringify(user));
+    } else {
+      localStorage.removeItem(CACHED_USER_KEY);
+    }
+  } catch (err) {
+    console.warn('Failed to update cached user in localStorage:', err);
+  }
+}
+
+function clearCachedUser(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.removeItem(CACHED_USER_KEY);
+  } catch (err) {
+    console.warn('Failed to remove cached user from localStorage:', err);
+  }
+}
+
+function isUnauthorizedError(error: unknown): boolean {
+  if (!error) return false;
+  if (typeof error === 'object' && error !== null) {
+    if ('status' in error && (error as { status?: unknown }).status === 401) {
+      return true;
+    }
+    if ('statusCode' in error && (error as { statusCode?: unknown }).statusCode === 401) {
+      return true;
+    }
+  }
+  const msg = error instanceof Error ? error.message : String(error);
+  const lower = msg.toLowerCase();
+  return (
+    lower.includes('401') ||
+    lower.includes('nicht authentifiziert') ||
+    lower.includes('unauthorized') ||
+    lower.includes('not authenticated')
+  );
+}
+
+function isNetworkOrOfflineError(error: unknown): boolean {
+  if (
+    typeof navigator !== 'undefined' &&
+    typeof navigator.onLine === 'boolean' &&
+    !navigator.onLine
+  ) {
+    return true;
+  }
+  if (!error) return false;
+  const msg = (error instanceof Error ? error.message : String(error)).toLowerCase();
+  return (
+    msg.includes('failed to fetch') ||
+    msg.includes('network') ||
+    msg.includes('networkerror') ||
+    msg.includes('load failed') ||
+    msg.includes('econnrefused') ||
+    msg.includes('abort')
+  );
+}
+
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -43,6 +123,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [providers, setProviders] = useState<AuthProvidersResponse>({
     authentik: false,
   });
+  const [isOfflineSession, setIsOfflineSession] = useState<boolean>(false);
 
   // On mount: check URL for OAuth params and fetch current session & providers
   useEffect(() => {
@@ -84,17 +165,61 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (isMounted) {
           if (userRes.status === 'fulfilled') {
             setUser(userRes.value);
+            setIsOfflineSession(false);
+            cacheUser(userRes.value);
           } else {
-            setUser(null);
+            const error = userRes.reason;
+            if (isUnauthorizedError(error)) {
+              clearCachedUser();
+              setUser(null);
+              setIsOfflineSession(false);
+            } else if (
+              isNetworkOrOfflineError(error) ||
+              (typeof navigator !== 'undefined' &&
+                typeof navigator.onLine === 'boolean' &&
+                !navigator.onLine)
+            ) {
+              const cached = getStoredUser();
+              if (cached) {
+                setUser(cached);
+                setIsOfflineSession(true);
+              } else {
+                setUser(null);
+                setIsOfflineSession(false);
+              }
+            } else {
+              // Non-401 server failure / fallback: check cached user
+              const cached = getStoredUser();
+              if (cached) {
+                setUser(cached);
+                setIsOfflineSession(true);
+              } else {
+                setUser(null);
+                setIsOfflineSession(false);
+              }
+            }
           }
 
           if (providersRes.status === 'fulfilled') {
             setProviders(providersRes.value);
           }
         }
-      } catch {
+      } catch (err) {
         if (isMounted) {
-          setUser(null);
+          if (isUnauthorizedError(err)) {
+            clearCachedUser();
+            setUser(null);
+            setIsOfflineSession(false);
+          } else {
+            const cached = getStoredUser();
+            if (cached) {
+              setUser(cached);
+              setIsOfflineSession(true);
+            } else {
+              setUser(null);
+              setIsOfflineSession(false);
+            }
+          }
         }
       } finally {
         if (isMounted) {
@@ -105,8 +230,33 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     initializeAuth();
 
+    // Silently re-validate session when browser comes back online
+    const handleOnline = async () => {
+      try {
+        const freshUser = await api.getMe();
+        if (isMounted) {
+          setUser(freshUser);
+          setIsOfflineSession(false);
+          cacheUser(freshUser);
+        }
+      } catch (err) {
+        if (isUnauthorizedError(err) && isMounted) {
+          clearCachedUser();
+          setUser(null);
+          setIsOfflineSession(false);
+        }
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('online', handleOnline);
+    }
+
     return () => {
       isMounted = false;
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('online', handleOnline);
+      }
     };
   }, []);
 
@@ -117,6 +267,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       try {
         const loggedUser = await api.login(emailOrData, password);
         setUser(loggedUser);
+        setIsOfflineSession(false);
+        cacheUser(loggedUser);
         return loggedUser;
       } catch (err) {
         const msg = err instanceof Error ? err.message : 'Anmeldung fehlgeschlagen';
@@ -140,6 +292,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       try {
         const registeredUser = await api.register(emailOrData, nameOrPassword, password);
         setUser(registeredUser);
+        setIsOfflineSession(false);
+        cacheUser(registeredUser);
         return registeredUser;
       } catch (err) {
         const msg = err instanceof Error ? err.message : 'Registrierung fehlgeschlagen';
@@ -159,7 +313,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (err) {
       console.error('Logout error:', err);
     } finally {
+      clearCachedUser();
       setUser(null);
+      setIsOfflineSession(false);
       setAuthError(null);
       setLoading(false);
     }
@@ -169,9 +325,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const freshUser = await api.getMe();
       setUser(freshUser);
+      setIsOfflineSession(false);
+      cacheUser(freshUser);
       return freshUser;
-    } catch {
-      setUser(null);
+    } catch (err) {
+      if (isUnauthorizedError(err)) {
+        clearCachedUser();
+        setUser(null);
+        setIsOfflineSession(false);
+      }
       return null;
     }
   }, []);
@@ -186,6 +348,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       loading,
       authError,
       providers,
+      isOfflineSession,
       login,
       register,
       logout,
@@ -195,7 +358,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       isAdmin: user?.role === 'ADMIN',
       isAuthenticated: !!user,
     }),
-    [user, loading, authError, providers, login, register, logout, refreshUser, clearAuthError, setAuthError]
+    [
+      user,
+      loading,
+      authError,
+      providers,
+      isOfflineSession,
+      login,
+      register,
+      logout,
+      refreshUser,
+      clearAuthError,
+      setAuthError,
+    ]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
