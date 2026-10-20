@@ -12,6 +12,7 @@ export default defineConfig({
         name: 'Antiquitäten & Sammlungsstücke',
         short_name: 'Antiquitäten',
         description: 'Katalog- und Inventarverwaltung für Antiquitäten und Sammlungsstücke',
+        lang: 'de',
         theme_color: '#0f172a',
         background_color: '#f8fafc',
         display: 'standalone',

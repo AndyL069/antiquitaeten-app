@@ -163,13 +163,21 @@ function MainApp() {
 
   // Handlers for Item lifecycle
   const handleItemCreated = (newItem: Item) => {
-    setItems((prev) => [newItem, ...prev.filter((i) => i.id !== newItem.id)]);
+    setItems((prev) => {
+      const next = [newItem, ...prev.filter((i) => i.id !== newItem.id)];
+      saveItems(next).catch(console.error);
+      return next;
+    });
     loadLocations(); // Refresh item counters
     addToast(`Objekt „${newItem.name}“ erfolgreich angelegt!`, 'success');
   };
 
   const handleItemUpdated = (updatedItem: Item) => {
-    setItems((prev) => prev.map((i) => (i.id === updatedItem.id ? updatedItem : i)));
+    setItems((prev) => {
+      const next = prev.map((i) => (i.id === updatedItem.id ? updatedItem : i));
+      saveItems(next).catch(console.error);
+      return next;
+    });
     if (selectedItem?.id === updatedItem.id) {
       setSelectedItem(updatedItem);
     }
@@ -178,7 +186,11 @@ function MainApp() {
   };
 
   const handleItemDeleted = (deletedId: string) => {
-    setItems((prev) => prev.filter((i) => i.id !== deletedId));
+    setItems((prev) => {
+      const next = prev.filter((i) => i.id !== deletedId);
+      saveItems(next).catch(console.error);
+      return next;
+    });
     if (selectedItem?.id === deletedId) {
       setSelectedItem(null);
     }
@@ -348,6 +360,7 @@ function MainApp() {
         locations={locations}
         onClose={() => setIsNewItemOpen(false)}
         onSaved={handleItemCreated}
+        isOnline={isOnline}
       />
 
       {/* Item Form Modal (Edit Mode) */}
@@ -357,6 +370,7 @@ function MainApp() {
         locations={locations}
         onClose={() => setEditingItem(null)}
         onSaved={handleItemUpdated}
+        isOnline={isOnline}
       />
 
       {/* Auth Modal */}

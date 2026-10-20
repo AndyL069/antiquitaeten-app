@@ -22,6 +22,7 @@ export interface ItemFormModalProps {
   item?: Item | null;
   locations: Location[];
   onSaved: (savedItem: Item) => void;
+  isOnline?: boolean;
 }
 
 export const ItemFormModal: React.FC<ItemFormModalProps> = ({
@@ -30,6 +31,7 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
   item,
   locations,
   onSaved,
+  isOnline = true,
 }) => {
   const [persistedItem, setPersistedItem] = useState<Item | null>(item || null);
   const isEditMode = Boolean(persistedItem);
@@ -1049,6 +1051,11 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
           </div>
 
           <div className="flex items-center space-x-2 sm:space-x-3">
+            {!isOnline && (
+              <span className="text-xs text-amber-600 font-medium mr-3">
+                Offline: Änderungen können nicht gespeichert werden
+              </span>
+            )}
             <button
               type="button"
               onClick={onClose}
@@ -1061,7 +1068,8 @@ export const ItemFormModal: React.FC<ItemFormModalProps> = ({
             <button
               type="submit"
               form="item-form"
-              disabled={isSaving || isAnalyzing}
+              disabled={isSaving || isAnalyzing || !isOnline}
+              title={!isOnline ? "Speichern erfordert eine Internetverbindung" : undefined}
               className="flex items-center space-x-2 px-4 sm:px-6 py-2 sm:py-2.5 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-300 text-white text-xs sm:text-sm font-medium rounded-lg shadow-sm transition-colors"
             >
               {isSaving ? (
