@@ -21,12 +21,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     if (isOpen) {
-      clearAuthError();
       setLocalError(null);
       setPassword('');
       setConfirmPassword('');
     }
-  }, [isOpen, mode, clearAuthError]);
+  }, [isOpen, mode]);
 
   if (!isOpen) return null;
 

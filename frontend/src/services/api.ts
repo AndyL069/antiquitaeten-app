@@ -58,7 +58,9 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     } catch {
       // response wasn't JSON
     }
-    throw new Error(errorDetail);
+    const err = new Error(errorDetail) as Error & { status?: number };
+    err.status = response.status;
+    throw err;
   }
 
   const contentType = response.headers.get('content-type');

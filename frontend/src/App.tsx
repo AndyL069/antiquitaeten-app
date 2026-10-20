@@ -37,7 +37,7 @@ interface ToastNotification {
 }
 
 function MainApp() {
-  const { isAuthenticated, loading: authLoading, isAdmin } = useAuth();
+  const { isAuthenticated, loading: authLoading, isAdmin, authError } = useAuth();
   const { isOnline } = useOnlineStatus();
   const [lastSyncIso, setLastSyncIso] = useState<string | null>(null);
 
@@ -72,6 +72,14 @@ function MainApp() {
   const removeToast = (id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   };
+
+  // Surface authentication errors (e.g. from OAuth redirect or session issues)
+  useEffect(() => {
+    if (authError) {
+      addToast(authError, 'error');
+      setIsAuthOpen(true);
+    }
+  }, [authError, addToast]);
 
   // Load items
   const loadItems = useCallback(async () => {
